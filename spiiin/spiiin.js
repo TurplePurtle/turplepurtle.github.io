@@ -25,19 +25,8 @@ function makeEl(t, a, p) {
 }
 
 // spiiin
-var spiiin = {};
-/*
-spiiin.updateVectorHead = function(v) {
-	if (v.parent) {
-		spiiin.updateVectorHead(v.parent);
-		v.hx = v.parent.hx + v.x;
-		v.hy = v.parent.hy + v.y;
-	} else {
-		v.hx = v.x;
-		v.hy = v.y;
-	}
-};
-*/
+var spiiin = { tick: 0 };
+
 spiiin.updateVectorHeads = function(v) {
 	var vectors = this.vectors, n = vectors.length;
 
@@ -74,6 +63,7 @@ spiiin.load = function() {
 	this.tcanvas.width = this.canvas.width = 1024;
 	this.tcanvas.height = this.canvas.height = 768;
 	this.tctx.strokeStyle = "#eee";
+    this.tctx.fillStyle = "rgba()";
 	this.tctx.lineWidth = 0.2;
 	this.ctx.fillStyle = "#af3";
 	this.ctx.strokeStyle = "brown";
@@ -155,17 +145,32 @@ spiiin.draw = function(ctx) {
 	var pen = this.valias.pen;
 	this.circle(ctx, pen.hx, pen.hy, cr);
 
-	// this.tctx.strokeRect(pen.hx-0.5, pen.hy-0.5,1,1);
     if (this.lastX) {
-        this.tctx.beginPath();
-        this.tctx.moveTo(this.lastX, this.lastY);
-        this.tctx.lineTo(pen.hx, pen.hy);
-        this.tctx.stroke();
+        var tctx = this.tctx;
+    
+        // Fade-out effect (multiplicative)
+        tctx.save();
+        this.tctx.globalCompositeOperation = "copy";
+        tctx.globalAlpha = 0.97;
+        tctx.drawImage(tctx.canvas, 0, 0);
+        tctx.restore();
+        
+        if (this.tick % 60 === 0) {
+            // Fade-out effect (subtractive)
+            var imgData = tctx.getImageData(0,0,tctx.canvas.width,tctx.canvas.height);
+            var d = imgData.data;
+            for (var i = 3; i < d.length; i+=4) d[i] -= 1;
+            tctx.putImageData(imgData,0,0);
+        }
 
-        // this.tctx.beginPath();
-        // this.tctx.moveTo(this.canvas.width - this.lastX, this.lastY);
-        // this.tctx.lineTo(this.canvas.width - pen.hx, pen.hy);
-        // this.tctx.stroke();
+        // dotted line
+        // this.tctx.strokeRect(pen.hx-0.5, pen.hy-0.5,1,1);
+        
+        // solid line
+        tctx.beginPath();
+        tctx.moveTo(this.lastX, this.lastY);
+        tctx.lineTo(pen.hx, pen.hy);
+        tctx.stroke();
     }
     this.lastX = pen.hx;
     this.lastY = pen.hy;
@@ -179,6 +184,7 @@ spiiin.loop = function(time) {
 	s.draw(s.ctx);
 
 	s.lastTime = time;
+    s.tick++;
 	requestAnimationFrame(s.loop);
 };
 
@@ -187,7 +193,8 @@ window.addEventListener("load", function() {
 	s.canvas = makeEl("canvas", {id: "stage"}, getEl("#canvas-container"));
 	s.ctx = s.canvas.getContext("2d");
 	s.tcanvas = makeEl("canvas", {id: "trace"}, getEl("#canvas-container"));
-	s.tctx = s.tcanvas.getContext("2d")
+	s.tctx = s.tcanvas.getContext("2d");
+    
 	s.load();
 	s.lastTime = Date.now();
 	requestAnimationFrame(s.loop);
