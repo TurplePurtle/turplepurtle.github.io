@@ -62,11 +62,10 @@ spiiin.circle = function(ctx, x, y, r, stroke) {
 spiiin.load = function() {
 	this.tcanvas.width = this.canvas.width = 1024;
 	this.tcanvas.height = this.canvas.height = 768;
-	this.tctx.strokeStyle = "#eee";
-    this.tctx.fillStyle = "rgba()";
+	this.tctx.strokeStyle = "#fff";
 	this.tctx.lineWidth = 0.2;
 	this.ctx.fillStyle = "#af3";
-	this.ctx.strokeStyle = "brown";
+	this.ctx.strokeStyle = "#357";
 
 	var
 	vectors = this.vectors = [],
@@ -150,12 +149,12 @@ spiiin.draw = function(ctx) {
     
         // Fade-out effect (multiplicative)
         tctx.save();
-        this.tctx.globalCompositeOperation = "copy";
-        tctx.globalAlpha = 0.97;
+        tctx.globalCompositeOperation = "copy";
+        tctx.globalAlpha = 0.98;
         tctx.drawImage(tctx.canvas, 0, 0);
         tctx.restore();
         
-        if (this.tick % 60 === 0) {
+        if (this.tick % 40 === 0) {
             // Fade-out effect (subtractive)
             var imgData = tctx.getImageData(0,0,tctx.canvas.width,tctx.canvas.height);
             var d = imgData.data;
