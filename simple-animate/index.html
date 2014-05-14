@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SimpleAnimateTool</title>
+  <link rel="stylesheet" href="default.css">
+  <base target="_blank" />
+</head>
+
+<body>
+  <object id="wtPlugin" type="application/x-wacomtabletplugin">
+    <param name="onload" value="pluginLoaded">
+  </object>
+  
+  <noscript>
+  <h3>This page requires JavaScript.</h3>
+  </noscript>
+
+<!-- #body-wrapper is unselectable to prevent canvas drag silliness -->
+<div id="body-wrapper" class="unselectable">
+  <h1 id="header">Simple<span>Animate</span>Tool</h1>
+
+  <div id="thumb-box" class="box hbox">
+    <div class="box-header">
+      <h2 class="box-title">Frames</h2>
+    </div>
+    <div>
+      <button id="new-frame-button">New Frame</button><!--
+   --><button id="duplicate-frame-button">Duplicate Frame</button><!--
+   --><button id="delete-frame-button">Delete Frame</button><!--
+   --><button id="move-frame-left-button">&larr;</button><!--
+   --><button id="move-frame-right-button">&rarr;</button>
+    </div>
+
+    <div class="container"></div>
+  </div>
+
+  <div id="layer-box" class="box vbox">
+    <div class="box-header">
+      <h2 class="box-title">Frame Layers</h2>
+    </div>
+    <div class="center">
+      <button id="new-layer-button">New</button><!--
+   --><button id="merge-down-layer-button">Merge Down</button><!--
+   --><button id="delete-layer-button">Delete</button><!--
+   --><button id="copy-layer-button">Copy</button><!--
+   --><button id="paste-layer-button">Paste</button><!--
+   --><button id="move-layer-up-button">&uarr;</button><!--
+   --><button id="move-layer-down-button">&darr;</button>
+    </div>
+
+    <div class="container"></div>
+  </div>
+
+  <div id="tool-box" class="box vbox">
+    <div class="box-header">
+      <h2 class="box-title">Tools</h2>
+    </div>
+
+    <div class="center">
+      Frame rate:
+      <input id="gif-fps-input" type="text" value="12" size="2"><br>
+      <button id="export-gif-button">Compile Gif</button>
+    </div>
+    <div class="container">
+      <p>
+        Diameter: <span id="tool-diameter-value"></span>px<br>
+        <input id="tool-diameter-slider" type="range" min="1" max="100">
+      </p>
+      <p>
+        Color: <input id="pen-color-picker" type="color"
+          size="7" maxlength="7" value="#000000"></input>
+      </p>
+    </div>
+  </div>
+
+  <div id="canvas-box" class="box">
+    <div class="box-header">
+      <h2 class="box-title">Canvas</h2>
+    </div>
+    <div id="canvas-container-container">
+      <div id="canvas-container"></div>
+    </div>
+  </div>
+  
+  <div class="box hbox">
+    <div class="box-header">
+      <h2 class="box-title">About</h2>
+    </div>
+    <div class="container">
+      <p>Draw frame sequences to create animated Gifs. As simple as that.</p>
+      <p>Coded in HTML5 &mdash; TurplePurtle.</p>
+      <p>Gif encoding
+      <a href="http://github.com/antimatter15/jsgif">library</a> by
+      <a href="http://antimatter15.com/wp/2010/07/javascript-to-animated-gif/">antimatter</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- begin-scripts -->
+<script src="jsgif/LZWEncoder.min.js"></script>
+<script src="jsgif/NeuQuant.min.js"></script>
+<script src="jsgif/GIFEncoder.min.js"></script>
+<!-- script src="jszip/jszip-all.min.js"></script -->
+<script src="jscolor/jscolor.min.js"></script>
+<script src="html5slider/html5slider.min.js"></script>
+<script src="lib/keymaster.min.js"></script>
+<script src="app/imgurUpload.js"></script>
+<script src="app/util.js"></script>
+<script src="app/app.js"></script>
+<script src="app/tools.js"></script>
+<!-- end-scripts -->
+<!-- delete-line
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-7419695-5']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+delete-line -->
+</body>
+</html>

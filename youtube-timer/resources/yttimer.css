@@ -1,0 +1,76 @@
+html, body {
+  background-color: #333;
+  color: #eee;
+  font-family: "Lucida Sans Unicode", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+a { color: #eee; text-decoration: none; }
+input { border-width: 1px; }
+input, button {
+  background-color: #333;
+  color: #eee;
+  text-align: center;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+}
+label { margin: 0 2px; }
+#timer {
+  font-size: 64px;
+  margin: 24px 0;
+}
+#timer input {
+  border: 0;
+  color: #ddd;
+  font: normal 64px "Lucida Sans Unicode", sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 300px;
+}
+#yt-container { background-color: #000; }
+#link-box {
+  border: 1px solid #eee;
+  font-size: 11pt;
+  width: 500px;
+}
+#qrc {
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+}
+#vol, #at { width: 60px; }
+#search-box form { text-align: center; }
+#search-q { text-align: left; width: 360px; }
+.box {
+  background-color: #222;
+  margin-bottom: 4px;
+  padding: 12px;
+  position: relative;
+  width: 600px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+}
+.close-button {
+  color: #999;
+  position: absolute;
+  right: 4px;
+  top: 0;
+}
+.vid {
+  border-bottom: 1px solid;
+  font-size: .8em;
+  margin: 4px auto;
+  overflow: hidden;
+  padding: 5px;
+  width: 540px;
+}
+.vid h3 { font-size: inherit; font-weight: bold; margin: 8px 0 0; }
+.vid p { line-height: 1.1em; margin: 0 0 2px 0; text-align: justify; }
+.thumb { border: 2px solid #555; float: left; margin: 8px; }
+.center { text-align: center; }
+.ctr { margin-left: auto; margin-right: auto; }
+.small { font-size: .9em; }
+.i { color: #999; font-style: italic; }

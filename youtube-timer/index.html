@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>YouTube Timer</title>
+<link rel="stylesheet" href="resources/yttimer.css">
+<script src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script src="resources/yttimer.js"></script>
+</head>
+
+<body>
+<p id="timer" class="center">00:00:00</p>
+
+<p class="center">
+  <button id="yt-load">Load Video</button>
+  <button id="yt-search">Search for Videos</button>
+  <button id="set-time">Set Timer</button>
+  <button id="start">Start</button>
+</p>
+
+<div id="yt-container" class="center">
+  <p id="yt-player">Make sure your browser has JavaScript enabled and has Flash Player 8 or greater installed.</p>
+</div>
+
+<p class="center small">
+  <label for="at">Volume: </label><input type="text" id="vol" value="100">
+  <label for="at">Start At: </label><input type="text" id="at" value="00:00">
+  <label>Size:</label><button onclick="ytResize(792,494);">Large</button>
+  <button onclick="ytResize(560,349);">Medium</button>
+  <button onclick="ytResize(396,247);">Small</button>
+  <button onclick="ytResize(1,1);">1 pixel</button>
+  <input type="checkbox" id="loop"><label for="loop">Loop</label>
+</p>
+<p class="center">
+  <button id="yt-reset">Reset Video</button>
+  <button id="get-link">Get Link</button>
+  <button id="get-qr">Get QR Code</button>
+</p>
+<div id="more" class="center"></div>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-7419695-4']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</body>
+</html>

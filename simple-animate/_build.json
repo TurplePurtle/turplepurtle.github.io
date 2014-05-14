@@ -1,0 +1,6 @@
+{
+  "file": "index.html",
+  "include": ["default.css"],
+  "output-dir": "dist",
+  "output-name": "app-min.js"
+}

@@ -1,0 +1,39 @@
+body {
+  background-color: #333;
+  color: #eee;
+  font-family: verdana, geneva, sans-serif;
+  font-size: 76%;
+}
+
+#canvas-container {
+  margin: 12px auto;
+  text-align: center;
+}
+#stage {
+  position: absolute;
+  z-index: 2;
+}
+#trace {
+  background-color: #111;
+  position: relative;
+  z-index: 1;
+}
+#sliders {
+  color: #333;
+  font-weight: bold;
+  margin: 12px auto;
+  text-align: center;
+  width: 800px;
+}
+.dragdealer {
+  background-color: #ddc;
+  border-radius: 5px;
+  height: 20px;
+  margin: 12px auto;
+}
+.dragdealer .handle {
+  background-color: #9c3;
+  border-radius: 5px;
+	line-height: 20px;
+  width: 80px;
+}

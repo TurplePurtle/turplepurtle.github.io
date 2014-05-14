@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pole-Zero PLOT</title>
+<style>
+body {
+  background-color: #333;
+  color: #eee;
+}
+a {
+  color: #ac3;
+}
+canvas {
+  background-color: #222;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Pole-Zero Diagram and Magnitude Response</h2>
+
+<canvas id="pole-zero">Your browser sucks.</canvas>
+<canvas id="magnitude">Honestly.</canvas>
+<br>
+^ Click on this circle thingy.
+<a href="#" onclick="scale=+prompt('Enter maximum y-value.',scale)||4">
+Change Magnitude Plot Scale
+</a>
+
+<h3>Positions:</h3>
+Zero1: (<span id="zero1-x">0</span>, <span id="zero1-y">0</span>)<br>
+Zero2: (<span id="zero2-x">0</span>, <span id="zero2-y">0</span>)<br>
+Pole1: (<span id="pole1-x">0</span>, <span id="pole1-y">0</span>)<br>
+Pole2: (<span id="pole2-x">0</span>, <span id="pole2-y">0</span>)<br>
+
+<h3>Selected:</h3>
+<input id="zero1" name="current" type="radio" value="0" checked>
+<label for="zero1">Zero 1</label>
+<input id="zero2" name="current" type="radio" value="1">
+<label for="zero2">Zero 2</label>
+<input id="pole1" name="current" type="radio" value="2">
+<label for="pole1">Pole 1</label>
+<input id="pole2" name="current" type="radio" value="3">
+<label for="pole2">Pole 2</label>
+
+<script>
+function $(s,a,p) {
+  p = p || document;
+  return a ? p.querySelectorAll(s) : p.querySelector(s);
+}
+
+var pzCanvas = $("#pole-zero");
+var pzCtx = pzCanvas.getContext("2d");
+var radius = 150;
+pzCanvas.width = pzCanvas.height = 2*radius;
+
+var magCanvas = $("#magnitude");
+var magCtx = magCanvas.getContext("2d");
+magCanvas.width = 500;
+magCanvas.height = 300;
+
+var current = null;
+var roots = ["zero1", "zero2", "pole1", "pole2"].map(function(name) {
+  return {
+    x: 0, y: 0,
+    xDraw: radius, yDraw: radius,
+    xDOM: $("#" + name + "-x"), yDOM: $("#" + name + "-y")
+  };
+});
+roots[0].conj = roots[1];
+roots[1].conj = roots[0];
+roots[2].conj = roots[3];
+roots[3].conj = roots[2];
+
+current = roots[0];
+
+function pzDraw() {
+  // Set it us up
+  pzCtx.clearRect(0, 0, pzCanvas.width, pzCanvas.height);
+  pzCtx.beginPath();
+  pzCtx.moveTo(2*radius, 0);
+  pzCtx.arc(radius, radius, radius, 0, 2*Math.PI, false);
+  pzCtx.strokeStyle = "#777";
+  pzCtx.stroke();
+  
+  // fuck bitches
+  pzCtx.fillStyle = "blue";
+  pzCtx.fillRect(roots[2].xDraw - 2, roots[2].yDraw - 2, 4, 4);
+  pzCtx.fillRect(roots[3].xDraw - 2, roots[3].yDraw - 2, 4, 4);
+  pzCtx.fillStyle = "green";
+  pzCtx.fillRect(roots[0].xDraw - 2, roots[0].yDraw - 2, 4, 4);
+  pzCtx.fillRect(roots[1].xDraw - 2, roots[1].yDraw - 2, 4, 4);
+}
+pzDraw();
+
+var scale = 4;
+function magDraw() {
+  var width = magCanvas.width;
+  var height = magCanvas.height;
+  var fullScale = height / scale;
+  var step = Math.PI / width;
+
+  magCtx.clearRect(0, 0, width, height);
+  magCtx.fillStyle = "#444";
+  magCtx.fillRect(0, height - 1- fullScale, width, 1);
+  
+  magCtx.fillStyle = "#aaa";
+  for (var i = 0; i < width; i++) {
+    var w = i * step;
+    var mag = fullScale;
+    for (var j = 0; j < 4; j++) {
+      var dx = (roots[j].x - Math.cos(w));
+      var dy = (roots[j].y - Math.sin(w));
+      if (j < 2)
+        mag *= Math.sqrt(dx*dx + dy*dy);
+      else
+        mag /= Math.sqrt(dx*dx + dy*dy);
+    }
+    magCtx.fillRect(i, height - 1 - mag, 1, 1);
+  }
+}
+magDraw();
+
+function pzMove(ev) {
+  if (!ev) return;
+  
+  var xPos, yPos;
+  
+  if (ev.offsetX) {
+    xPos = ev.offsetX;
+    yPos = ev.offsetY;
+  } else if (ev.layerX) {
+    xPos = ev.layerX;
+    yPos = ev.layerY;
+  } else return;
+  
+  current.x = (xPos / radius - 1);
+  current.y = (1 - yPos / radius);
+  current.xDraw = xPos;
+  current.yDraw = yPos;
+  current.xDOM.innerHTML = current.x.toPrecision(3);
+  current.yDOM.innerHTML = current.y.toPrecision(3);
+  pzDraw();
+  magDraw();
+}
+
+var mouseDown = false;
+pzCanvas.addEventListener("mousemove", function(ev) {
+  if (mouseDown) pzMove(ev);
+}, false);
+pzCanvas.addEventListener("mousedown", function(ev) {
+  mouseDown = true;
+  pzMove(ev);
+}, false);
+window.addEventListener("mouseup", function() {
+  mouseDown = false;
+}, false);
+
+(function() {
+  function selectRoot() {
+    current = roots[+this.value];
+  }
+  ["zero1", "zero2", "pole1", "pole2"].forEach(function(id) {
+    $("#" + id).addEventListener("change", selectRoot, false);
+  });
+})();
+</script>
+
+</body>
+</html>
