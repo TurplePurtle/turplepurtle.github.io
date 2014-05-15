@@ -1,0 +1,38 @@
+body {
+  background-color: #333;
+  color: #eee;
+  font-family: Verdana;
+  margin: 0;
+}
+
+a {
+  color: #f0a;
+  text-decoration: none;
+  atext-shadow: -1px 1px 0px #fff;
+}
+
+h1 {
+  border-bottom: 3px double #444;
+  font-size: 2em;
+}
+h2 {
+  border-bottom: 1px solid #444;
+}
+
+.simple-list {
+  line-height: 1.5em;
+  list-style-image: url('arrow_12x12.png');
+  list-style-type: none;
+  padding-left: 32px;
+}
+
+.content {
+  background-color: #222;
+  border-radius: 2em;
+  margin: 1em auto;
+  width: 960px;
+}
+
+.marginbox {
+  margin: 2em;
+}
