@@ -3,18 +3,29 @@
 <head>
 <title>TurplePurtle.com</title>
 <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+<meta name="google-site-verification" content="8uiMpypyy-qYK1YQh5g5EFqBSBmJeX-1F6Gvv4zxByc" />
 <style>
 body {
-  background-color: #aac;
-  background-image: url('texture.png');
-  color: #333;
+  background-color: #000;
+  color: #eee;
   font-family: Helvetica,Arial,Verdana,sans-serif;
   font-size: 76%;
 }
+body:after {
+  background-image: url('texture.png');
+  content: "";
+  display: block;
+  top: 0;
+  left: 0;
+  opacity: 0.3;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
 a {
-  color: #425;
+  color: #f29;
   text-decoration: none;
-  text-shadow: -1px 1px 0px #fff;
 }
 ul {
   list-style-type: none;
@@ -23,35 +34,51 @@ ul {
   overflow: hidden;
 }
 li a {
-  background-color: #dde;
+  background-color: #333;
+  box-shadow: 0px -2px 2px -2px #000 inset, 0px 2px 2px -2px #fac inset;
+  color: #f49;
   display: block;
-  padding: 0.4em 0 0.4em 20px;
+  padding: 0.4em 0 0.4em 6px;
+  text-shadow: -1px 1px 0px #111;
+  transition: all 0.3s ease-out;
 }
 li a:hover {
-  background-color: #eef;
+  background-color: #3a3a3a;
+  color: #f5a;
+  padding-left: 16px;
+}
+li a:before {
+  color: #eee;
+  content: '\22ee';
+  margin-right: 4px;
+  text-shadow: 1px -1px 0 #000;
 }
 .box {
   border: 3px solid #777;
   border-radius: 5px;
-  box-shadow: -4px 3px 8px #333;
-  margin: 8px;
+  box-shadow: 0px 0px 8px 8px #444;
+  margin: 32px;
   width: 300px;
 }
 .box-header {
-  background-color: #bbc;
+  background-color: #ebc;
+  box-shadow: 0 6px 6px -6px #fff inset, 0 -3px 3px -3px #000 inset;
   color: #333;
   margin: 0;
   padding: 0.5em 20px;
   text-shadow: -1px 1px 0px #fff;
 }
-.box-header,
-li a {
-  background-image:
-  linear-gradient(to bottom, rgba(255,255,255,0.5) 0, rgba(255,255,255,0) 5px),
-  linear-gradient(to top, rgba(170,170,170,0.5) 0, rgba(170,170,170,0) 8px);
+.box-footer {
+  background-color: #111;
+  padding: 6px;
+  text-align: center;
+}
+.box-footer p {
+  margin: 6px 0;
 }
 .center {
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>
 </head>
@@ -68,6 +95,9 @@ li a {
     <li><a href="./zen-spinner/">Zen Spinner</a></li>
     <li><a href="./pole-zero/">Pole-Zero Diagram Plotter</a></li>
   </ul>
+  <div class="box-footer">
+    <p>Santiago J &ndash; <a href="https://github.com/TurplePurtle">GitHub</a></p>
+  </div>
 </div>
 
 </body>
