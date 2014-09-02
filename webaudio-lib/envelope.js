@@ -30,9 +30,9 @@ function sqrtSignal(ev) {
 function vocoderBandMeter(context, f0, bandwidth) {
 	var sys = {};
 
-	sys.sqrt = context.createJavaScriptNode(512, 1, 1); // sqrt node
+	sys.sqrt = context.createScriptProcessor(512, 1, 1); // sqrt node
 	sys.lowpass = context.createBiquadFilter();
-	sys.square = context.createJavaScriptNode(256, 1, 1);
+	sys.square = context.createScriptProcessor(256, 1, 1);
 	sys.bandpass2 = context.createBiquadFilter();
 	sys.bandpass1 = context.createBiquadFilter();
 
@@ -41,19 +41,19 @@ function vocoderBandMeter(context, f0, bandwidth) {
 
 	sys.sqrt.onaudioprocess = sqrtSignal;
 
-	sys.lowpass.type = sys.lowpass.LOWPASS;
+	sys.lowpass.type = "lowpass";
 	sys.lowpass.frequency.value = 50;
 	sys.lowpass.connect(sys.sqrt);
 
 	sys.square.onaudioprocess = squareSignal;
 	sys.square.connect(sys.lowpass);
 
-	sys.bandpass2.type = sys.bandpass2.BANDPASS;
+	sys.bandpass2.type = "bandpass";
 	sys.bandpass2.frequency.value = f0;
 	sys.bandpass2.Q.value = f0 / bandwidth;
 	sys.bandpass2.connect(sys.square);
 
-	sys.bandpass1.type = sys.bandpass1.BANDPASS;
+	sys.bandpass1.type = "bandpass";
 	sys.bandpass1.frequency.value = f0;
 	sys.bandpass1.Q.value = f0 / bandwidth;
 	sys.bandpass1.connect(sys.bandpass2);
