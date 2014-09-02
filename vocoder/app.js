@@ -64,7 +64,7 @@
 		if (!synth) return;
 		var releaseTime = 0.5;
 
-		synth.output.gain.setTargetValueAtTime(0, 0, releaseTime / 5);
+		synth.output.gain.setTargetAtTime(0, 0, releaseTime / 5);
 		setTimeout(function() {
 			synth.output.disconnect();
 		}, 1000 * releaseTime);
