@@ -13,12 +13,12 @@
 		
 		/// Components
 		this.context = context;
-		this.gain = context.createGainNode();
+		this.gain = context.createGain();
 		this.modulatorEnvelopes = [];
-		this.modulatorGain = context.createGainNode();
+		this.modulatorGain = context.createGain();
 		this.carrierGains = [];
 		this.carrierFilters = [[], []];
-		this.carrierGain = context.createGainNode();
+		this.carrierGain = context.createGain();
 		this.output = this.gain;
 		this.carrierInput = this.carrierGain;
 		this.modulatorInput = this.modulatorGain;
@@ -47,7 +47,7 @@
 		
 		/// Nodes for each band on the carrier side
 		for (var i = 0; i < numBands; i++) {
-			var bandGain = context.createGainNode();
+			var bandGain = context.createGain();
 			var filter1 = context.createBiquadFilter();
 			var filter2 = context.createBiquadFilter();
 			var f0 = (this.freqBounds[i] + this.freqBounds[i+1]) / 2;
