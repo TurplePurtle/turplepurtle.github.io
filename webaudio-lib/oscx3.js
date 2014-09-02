@@ -14,12 +14,12 @@ var O = function(context) {
 		return context.createOscillator();	
 	});
 	this.oscGains = this.osc.map(function(osc) {
-		var gainNode = context.createGainNode();
+		var gainNode = context.createGain();
 		osc.gainNode = gainNode;
 		osc.gain = gainNode.gain;
 		return gainNode;
 	});
-	this.gain = context.createGainNode();
+	this.gain = context.createGain();
 	this.output = this.gain;
 	
 	this.osc[0].detune.value = 0;
