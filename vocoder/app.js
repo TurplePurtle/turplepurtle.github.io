@@ -12,7 +12,7 @@
 	compressor = context.createDynamicsCompressor(),
 	// synth = new OscX3(context),
 	// reverb = context.createConvolver(),
-	delay = context.createDelayNode(),
+	delay = context.createDelay(),
 	vocoder = new Vocoder(context, 64);
 
 
