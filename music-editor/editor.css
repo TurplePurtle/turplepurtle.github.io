@@ -1,0 +1,20 @@
+.music-editor {
+  background-color: #ddd;
+  position: relative;
+}
+
+.music-note {
+  background-color: #0ee;
+  border-radius: 4px;
+  border: 1px solid #777;
+  height: 18px;
+  position: absolute;
+}
+
+.music-note-stretch {
+  cursor: e-resize;
+  position: absolute;
+  right: -1px;
+  width: 3px;
+  height: 100%;
+}
