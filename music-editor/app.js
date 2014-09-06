@@ -1,5 +1,4 @@
 
-var editors = document.querySelectorAll(".music-editor-container");
-for (var i = 0; i < editors.length; i++) {
-    new Musicker.Editor(editors[i]);
-}
+var editorNode = document.querySelector(".music-editor-container");
+var editor = new Musicker.Editor(editorNode);
+editorNode.scrollTop = (editor.height - editorNode.offsetHeight) / 2;

@@ -2,7 +2,7 @@
 (function(exports) {
     "use strict";
 
-    window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext;
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 
     function Note(x, y, editor) {
@@ -36,7 +36,7 @@
         return this.degridifyX(this.x);
     };
     Note.prototype.pxToPitch = function(y) {
-        return this.degridifyY(this.y);
+        return this.degridifyY(this.editor.height - this.y);
     };
     Note.prototype.resizePx = function(x) {
         var pxDur = this.gridifyX(x);
@@ -115,7 +115,7 @@
         this.noteList = [];
         this.gridX = 10;
         this.gridY = 20;
-        this.height = 1600;
+        this.height = 10*12*20; // octaves * notes * px
         this.init();
     }
     Editor.prototype.init = function() {
@@ -124,9 +124,9 @@
         keyboard.classList.add("music-keyboard");
         keyboard.style.height = this.height + "px";
 
-        for (var i = 0, n = this.height / 20; i < n; i++) {
+        for (var i = this.height / 20; i > 0; i--) {
             var key = document.createElement("li");
-            var name = Editor.midiToName(i+1);
+            var name = Editor.midiToName(i);
             key.textContent = name;
             if (name.charAt(1) === "#") {
                 key.classList.add("black");
