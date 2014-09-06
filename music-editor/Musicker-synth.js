@@ -68,7 +68,7 @@
     };
     Synth.prototype.schedule = function(noteList) {
         var eventList = this.generateEventList(noteList);
-        var startTime = this.context.currentTime + 1;
+        var startTime = this.context.currentTime;
 
         for (var i = 0; i < eventList.length; i++) {
             var ev = eventList[i];
