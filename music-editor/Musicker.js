@@ -2,19 +2,19 @@
 (function(exports) {
     "use strict";
 
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-
-    function Note(x, y, editor) {
+    function Note(id, x, y, editor) {
         if (x < 0 || y < 0)
             throw new Error("Invalid X/Y for note");
 
+        this.id = id;
         this.editor = editor;
         this.x = this.gridifyX(x);
         this.y = this.gridifyY(y);
-        this.duration = 4 * this.editor.gridX;
-        this.time = this.pxToTime(x);
-        this.pitch = this.pxToPitch(y);
+        this.w = 4 * this.editor.gridX;
+        this.duration = this.pxToTime(this.w);
+        this.time = this.pxToTime(this.x);
+        this.pitch = this.pxToPitch(this.y);
         this.node = this.generateDOM();
     }
 
@@ -33,14 +33,15 @@
         return gy / this.editor.gridY;
     };
     Note.prototype.pxToTime = function(x) {
-        return this.degridifyX(this.x);
+        return this.degridifyX(x);
     };
     Note.prototype.pxToPitch = function(y) {
-        return this.degridifyY(this.editor.height - this.y);
+        return this.degridifyY(this.editor.height - y);
     };
     Note.prototype.resizePx = function(x) {
         var pxDur = this.gridifyX(x);
         this.node.style.width = pxDur + "px";
+        this.w = pxDur;
         this.duration = this.pxToTime(pxDur);
     };
     Note.prototype.movePx = function(x, y) {
@@ -59,7 +60,7 @@
         node.classList.add("music-note");
         node.style.left = this.x + "px";
         node.style.top = this.y + "px";
-        node.style.width = this.duration + "px";
+        node.style.width = this.w + "px";
 
         var self = this;
 
@@ -174,7 +175,7 @@
             "url(" + canvas.toDataURL("image/png") + ")";
     }
     Editor.prototype.addNoteXY = function(x, y) {
-        var note = new Note(x, y, this);
+        var note = new Note(this.noteList.length, x, y, this);
         this.noteList.push(note);
         this.div.appendChild(note.node);
     };
