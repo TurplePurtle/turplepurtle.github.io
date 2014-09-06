@@ -1,5 +1,27 @@
+
+.music-keyboard {
+  float: left;
+  font-size: small;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  width: 50px;
+}
+.music-keyboard > li {
+  background-color: #eee;
+  border-top: 1px solid #aaa;
+  color: #111;
+  height: 19px;
+}
+.music-keyboard > .black {
+  background-color: #111;
+  color: #eee;
+}
+
 .music-editor {
   background-color: #ddd;
+  margin-left: 50px;
   position: relative;
 }
 
