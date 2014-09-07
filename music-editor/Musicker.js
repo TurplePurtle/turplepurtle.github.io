@@ -63,7 +63,10 @@
         var ind = notes.indexOf(this);
 
         if (ind > -1) {
-            notes[ind] = notes.pop(); // cheaper than shifting everything
+            var lastNote = notes.pop();
+            if (this !== lastNote) {
+                notes[ind] = lastNote;
+            }
         } else {
             throw new Error("this should not happen");
         }
@@ -77,18 +80,18 @@
 
         var self = this;
 
-        // Note deleting
-        node.addEventListener("contextmenu", function(e) {
-            e.preventDefault();
-            self.remove();
-            return false;
-        }, false);
-
-        // Note moving
+        // Note moving / deleting
         this.moving = false;
         node.addEventListener("mousedown", function(e) {
             if (e.target === e.currentTarget) {
-                self.moving = true;
+                switch (e.which) {
+                    case 1:  // left-click
+                        self.moving = true;
+                        break;
+                    case 3:  // right-click
+                        self.remove();
+                        break;
+                }
             }
         }, false);
         this.editor.div.addEventListener("mousemove", function(e) {
@@ -99,7 +102,9 @@
             self.movePx(x, y);
         }, false);
         window.addEventListener("mouseup", function(e) {
-            self.moving = false;
+            if (e.which === 1) {
+                self.moving = false;
+            }
         }, false);
 
         // Note resizing
@@ -110,7 +115,9 @@
 
         this.resizing = false; // this.editor.resizing = this;
         stretch.addEventListener("mousedown", function(e) {
-            self.resizing = true;
+            if (e.which === 1) {
+                self.resizing = true;
+            }
         }, false);
         this.editor.div.addEventListener("mousemove", function(e) {
             if (!self.resizing) return;
@@ -118,7 +125,9 @@
             self.resizePx(e.clientX - rect.left - self.x);
         }, false);
         window.addEventListener("mouseup", function(e) {
-            self.resizing = false;
+            if (e.which === 1) {
+                self.resizing = false;
+            }
         }, false);
 
         node.appendChild(stretch);
@@ -168,15 +177,16 @@
         var self = this;
         var clickHandler = function(e) {
             if (e.target !== self.div) return;
-
-            var
-            x = e.layerX,
-            y = e.layerY;
-
-            self.addNoteXY(x, y);
+            if (e.which === 1) {
+                self.addNoteXY(e.layerX, e.layerY);
+            }
         };
 
         div.addEventListener("mousedown", clickHandler, false);
+        div.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+        }, false);
+
     };
     Editor.prototype.drawGrid = function(w, h, beat, measure) {
         var canvas = document.createElement("canvas");
