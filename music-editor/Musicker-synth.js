@@ -86,6 +86,7 @@
             var voice = this.voices[i];
             voice.osc.frequency.cancelScheduledValues(0);
             voice.gain.gain.cancelScheduledValues(0);
+            voice.gain.gain.setValueAtTime(0,0);
         }
     };
 

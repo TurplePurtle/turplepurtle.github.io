@@ -212,7 +212,7 @@
 
         this.div.style.backgroundImage =
             "url(" + canvas.toDataURL("image/png") + ")";
-    }
+    };
     Editor.prototype.addNoteXY = function(x, y) {
         var note = new Note(this.noteList.length, x, y, this);
         this.noteList.push(note);
