@@ -195,7 +195,7 @@
         canvas.width = w * beat * measure;
         canvas.height = h;
 
-        ctx.strokeStyle = "#bbb";
+        ctx.strokeStyle = "#ccc";
         ctx.beginPath();
         for (var i = 0; i < beat*measure; i++) {
             var x = i*w + 0.5;
@@ -205,7 +205,7 @@
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.strokeStyle = "#888";
+        ctx.strokeStyle = "#aaa";
         for (var i = 0; i < beat; i++) {
             var x = i*w*beat + 0.5;
             ctx.moveTo(x, 0);
