@@ -9,13 +9,17 @@
         this.containerDiv = div;
         this.div = null;
         this.noteList = [];
+        this.noteCounter = 0;
         this.gridX = 10;
         this.gridY = 20;
         this.height = 10*12*20; // octaves * notes * px
         this.noteWidth = 4 * this.gridX;
         this.init();
     }
-    Editor.prototype.init = function() {
+
+    var EditorProto = Editor.prototype;
+
+    EditorProto.init = function() {
         // Piano notes
         var keyboard = document.createElement("ol");
         keyboard.classList.add("music-keyboard");
@@ -58,7 +62,7 @@
         }, false);
 
     };
-    Editor.prototype.drawGrid = function(w, h, beat, measure) {
+    EditorProto.drawGrid = function(w, h, beat, measure) {
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext("2d");
 
@@ -93,13 +97,30 @@
         this.div.style.backgroundImage =
             "url(" + canvas.toDataURL("image/png") + ")";
     };
-    Editor.prototype.addNoteXY = function(x, y) {
-        var note = new Musicker.Note(this.noteList.length, x, y, this);
-        this.noteList.push(note);
-        this.div.appendChild(note.node);
+    EditorProto.addNoteXY = function(x, y) {
+        var note = new Musicker.Note(this.noteCounter, x, y, this);
+        if (this.emit("notecreate", note)) {
+            this.noteList.push(note);
+            this.noteCounter += 1;
+            this.div.appendChild(note.node);
+        }
     };
-    Editor.prototype.getRect = function() {
+    EditorProto.getRect = function() {
         return this.div.getBoundingClientRect();
+    };
+
+    EditorProto.emit = function(eventName, detail) {
+        var e = new CustomEvent(eventName, {
+            detail: detail,
+            cancelable: true,
+        });
+        return this.dispatchEvent(e);
+    };
+    EditorProto.dispatchEvent = function(e) {
+        return this.div.dispatchEvent(e);
+    };
+    EditorProto.addEventListener = function(e,f,c) {
+        return this.div.addEventListener(e,f,c);
     };
 
     Editor.NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];

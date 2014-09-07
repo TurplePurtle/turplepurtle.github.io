@@ -20,6 +20,13 @@
         this.node = this.generateDOM();
     }
 
+    Note.prototype.emit = function(eventName) {
+        var e = new CustomEvent(eventName, {
+            detail: this,
+            cancelable: true,
+        });
+        return this.editor.dispatchEvent(e);
+    };
     Note.prototype.gridifyX = function(x) {
         var gridX = this.editor.gridX;
         return (x / gridX | 0) * gridX;
@@ -89,10 +96,14 @@
             if (e.target === e.currentTarget) {
                 switch (e.which) {
                     case 1:  // left-click
-                        self.moving = true;
+                        if (self.emit("notemovestart")) {
+                            self.moving = true;
+                        }
                         break;
                     case 3:  // right-click
-                        self.remove();
+                        if (self.emit("noteremove")) {
+                            self.remove();
+                        }
                         break;
                 }
             }
@@ -106,7 +117,9 @@
         }, false);
         window.addEventListener("mouseup", function(e) {
             if (e.which === 1) {
-                self.moving = false;
+                if (self.emit("notemoveend")) {
+                    self.moving = false;
+                }
             }
         }, false);
 
@@ -119,7 +132,9 @@
         this.resizing = false; // this.editor.resizing = this;
         stretch.addEventListener("mousedown", function(e) {
             if (e.which === 1) {
-                self.resizing = true;
+                if (self.emit("noteresizestart")) {
+                    self.resizing = true;
+                }
             }
         }, false);
         this.editor.div.addEventListener("mousemove", function(e) {
@@ -129,7 +144,9 @@
         }, false);
         window.addEventListener("mouseup", function(e) {
             if (e.which === 1) {
-                self.resizing = false;
+                if (self.emit("noteresizeend")) {
+                    self.resizing = false;
+                }
             }
         }, false);
 
