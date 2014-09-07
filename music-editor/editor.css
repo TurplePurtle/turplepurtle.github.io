@@ -23,6 +23,7 @@
   background-color: #ddd;
   margin-left: 50px;
   position: relative;
+  user-select: none;
 }
 
 .music-note {

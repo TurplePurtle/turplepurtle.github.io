@@ -63,7 +63,7 @@
         var ind = notes.indexOf(this);
 
         if (ind > -1) {
-            notes.splice(ind, 1);
+            notes[ind] = notes.pop(); // cheaper than shifting everything
         } else {
             throw new Error("this should not happen");
         }
