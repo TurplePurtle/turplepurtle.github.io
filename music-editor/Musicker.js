@@ -11,7 +11,7 @@
         this.editor = editor;
         this.x = this.gridifyX(x);
         this.y = this.gridifyY(y);
-        this.w = 4 * this.editor.gridX;
+        this.w = this.editor.noteWidth;
         this.duration = this.pxToTime(this.w);
         this.time = this.pxToTime(this.x);
         this.pitch = this.pxToPitch(this.y);
@@ -43,6 +43,7 @@
         this.node.style.width = pxDur + "px";
         this.w = pxDur;
         this.duration = this.pxToTime(pxDur);
+        this.editor.noteWidth = pxDur;
     };
     Note.prototype.movePx = function(x, y) {
         var gx = this.gridifyX(x);
@@ -146,6 +147,7 @@
         this.gridX = 10;
         this.gridY = 20;
         this.height = 10*12*20; // octaves * notes * px
+        this.noteWidth = 4 * this.gridX;
         this.init();
     }
     Editor.prototype.init = function() {
