@@ -178,7 +178,10 @@
         var clickHandler = function(e) {
             if (e.target !== self.div) return;
             if (e.which === 1) {
-                self.addNoteXY(e.layerX, e.layerY);
+                var rect = self.getRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                self.addNoteXY(x, y);
             }
         };
 
