@@ -55,6 +55,19 @@
         this.node.style.left = gx + "px";
         this.node.style.top = gy + "px";
     };
+    Note.prototype.remove = function() {
+
+        this.node.parentNode.removeChild(this.node);
+
+        var notes = this.editor.noteList;
+        var ind = notes.indexOf(this);
+
+        if (ind > -1) {
+            notes.splice(ind, 1);
+        } else {
+            throw new Error("this should not happen");
+        }
+    };
     Note.prototype.generateDOM = function() {
         var node = document.createElement("div");
         node.classList.add("music-note");
@@ -63,6 +76,13 @@
         node.style.width = this.w + "px";
 
         var self = this;
+
+        // Note deleting
+        node.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+            self.remove();
+            return false;
+        }, false);
 
         // Note moving
         this.moving = false;
