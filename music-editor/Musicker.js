@@ -143,7 +143,7 @@
         div.classList.add("music-editor");
         div.style.height = this.height + "px";
         this.containerDiv.appendChild(div);
-        this.drawGrid(this.gridX, this.gridY);
+        this.drawGrid(this.gridX, this.gridY, 4, 4);
 
         var self = this;
         var clickHandler = function(e) {
@@ -158,17 +158,36 @@
 
         div.addEventListener("mousedown", clickHandler, false);
     };
-    Editor.prototype.drawGrid = function(w, h) {
+    Editor.prototype.drawGrid = function(w, h, beat, measure) {
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext("2d");
 
-        canvas.width = w;
+        canvas.width = w * beat * measure;
         canvas.height = h;
-        ctx.strokeStyle = "#777";
+
+        ctx.strokeStyle = "#bbb";
         ctx.beginPath();
-        ctx.moveTo(0,h);
-        ctx.lineTo(0,0);
-        ctx.lineTo(w,0);
+        for (var i = 0; i < beat*measure; i++) {
+            var x = i*w + 0.5;
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
+        }
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#888";
+        for (var i = 0; i < beat; i++) {
+            var x = i*w*beat + 0.5;
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
+        }
+        ctx.stroke();
+
+        ctx.strokeStyle = "#111";
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+        ctx.lineTo(0, 0);
+        ctx.lineTo(w*beat*measure, 0);
         ctx.stroke();
 
         this.div.style.backgroundImage =
