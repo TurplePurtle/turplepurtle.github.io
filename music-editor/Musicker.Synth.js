@@ -2,8 +2,10 @@
 (function(exports) {
     "use strict";
 
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    var Musicker = exports.Musicker || {};
+    exports.Musicker = Musicker;
 
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
     function Synth(context) {
         this.context = context;
@@ -90,8 +92,6 @@
         }
     };
 
-
-    exports.Musicker = exports.Musicker || {};
-    exports.Musicker.Synth = Synth;
+    Musicker.Synth = Synth;
 
 })(window);
