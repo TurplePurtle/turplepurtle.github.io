@@ -126,7 +126,7 @@
     Editor.NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     Editor.midiToName = function(num) {
         var note = Editor.NOTES[num % 12];
-        var oct = (num / 12 | 0) - 1;
+        var oct = num / 12 | 0;
         return note + oct;
     };
 
