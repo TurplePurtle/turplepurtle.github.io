@@ -117,8 +117,10 @@
         }, false);
         window.addEventListener("mouseup", function(e) {
             if (e.which === 1) {
-                if (self.emit("notemoveend")) {
-                    self.moving = false;
+                if (self.moving) {
+                    if (self.emit("notemoveend")) {
+                        self.moving = false;
+                    }
                 }
             }
         }, false);
@@ -144,8 +146,10 @@
         }, false);
         window.addEventListener("mouseup", function(e) {
             if (e.which === 1) {
-                if (self.emit("noteresizeend")) {
-                    self.resizing = false;
+                if (self.resizing) {
+                    if (self.emit("noteresizeend")) {
+                        self.resizing = false;
+                    }
                 }
             }
         }, false);
