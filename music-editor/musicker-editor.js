@@ -6,14 +6,17 @@
     exports.Musicker = Musicker;
 
     function Editor(div) {
+        this.bpm = 120;
         this.containerDiv = div;
         this.div = null;
         this.noteList = [];
         this.noteCounter = 0;
-        this.gridX = 10;
+        this.gridX = 40;
         this.gridY = 20;
+        this.gridSubdivisions = 4;
+        this.beatsPerMeasure = 4;
         this.height = 10*12*20; // octaves * notes * px
-        this.noteWidth = 4 * this.gridX;
+        this.noteWidth = this.gridX;
         this.init();
     }
 
@@ -43,7 +46,10 @@
         div.classList.add("music-editor");
         div.style.height = this.height + "px";
         this.containerDiv.appendChild(div);
-        this.drawGrid(this.gridX, this.gridY, 4, 4);
+        this.drawGrid(this.gridX,
+                      this.gridY,
+                      this.beatsPerMeasure,
+                      this.gridSubdivisions);
 
         var self = this;
         var clickHandler = function(e) {
@@ -62,36 +68,44 @@
         }, false);
 
     };
-    EditorProto.drawGrid = function(w, h, beat, measure) {
+    EditorProto.drawGrid = function(beatW, beatH, beatsPerMeasure, beatSubdivs) {
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext("2d");
 
-        canvas.width = w * beat * measure;
-        canvas.height = h;
+        var measureWidth = beatW * beatsPerMeasure;
+        canvas.width = measureWidth;
+        canvas.height = beatH;
 
-        ctx.strokeStyle = "#ccc";
-        ctx.beginPath();
-        for (var i = 0; i < beat*measure; i++) {
-            var x = i*w + 0.5;
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, h);
+        // sub-beat gridlines
+        if (beatSubdivs > 1) {
+            var subBeatWidth = beatW / beatSubdivs;
+
+            ctx.strokeStyle = "#ccc";
+            ctx.beginPath();
+            for (var i = 0; i < beatsPerMeasure * beatSubdivs; i++) {
+                var x = i*subBeatWidth + 0.5;
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, beatH);
+            }
+            ctx.stroke();
         }
-        ctx.stroke();
 
+        // beat gridlines
         ctx.beginPath();
         ctx.strokeStyle = "#aaa";
-        for (var i = 0; i < beat; i++) {
-            var x = i*w*beat + 0.5;
+        for (var i = 0; i < beatsPerMeasure; i++) {
+            var x = i*beatW + 0.5;
             ctx.moveTo(x, 0);
-            ctx.lineTo(x, h);
+            ctx.lineTo(x, beatH);
         }
         ctx.stroke();
 
+        // measure gridlines
         ctx.strokeStyle = "#333";
         ctx.beginPath();
-        ctx.moveTo(0.5, h);
+        ctx.moveTo(0.5, beatH);
         ctx.lineTo(0.5, 0.5);
-        ctx.lineTo(w*beat*measure, 0.5);
+        ctx.lineTo(measureWidth, 0.5);
         ctx.stroke();
 
         this.div.style.backgroundImage =

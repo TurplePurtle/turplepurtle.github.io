@@ -28,7 +28,7 @@
         return this.editor.dispatchEvent(e);
     };
     Note.prototype.gridifyX = function(x) {
-        var gridX = this.editor.gridX;
+        var gridX = this.editor.gridX / this.editor.gridSubdivisions;
         return (x / gridX | 0) * gridX;
     };
     Note.prototype.gridifyY = function(y) {
