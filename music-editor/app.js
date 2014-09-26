@@ -9,29 +9,31 @@ synth.output.connect(audioContext.destination);
 
 var playButton = document.querySelector("#play-button");
 var stopButton = document.querySelector("#stop-button");
+var bpmInput = document.querySelector("#bpm-input");
 
-playButton.onclick = function() {
-  synth.schedule(editor.noteList, editor.bpm);
-};
+var playing = false;
 
-stopButton.onclick = function() {
+function play() {
+  playing = true;
+  synth.schedule(editor.noteList, +bpmInput.value);
+}
+function stop() {
+  playing = false;
   synth.halt();
-};
+}
+
+playButton.onclick = play;
+stopButton.onclick = stop;
 
 // Play/Stop with space bar
-var spaceDown = false, playing = false;
+var spaceDown = false;
 window.addEventListener("keydown", function(e) {
   if (e.keyCode === 32) {
     e.preventDefault();
+
     if (!spaceDown) {
       spaceDown = true;
-      if (playing) {
-        synth.halt();
-        playing = false;
-      } else {
-        playing = true;
-        synth.schedule(editor.noteList, editor.bpm);
-      }
+      if (playing) stop(); else play();
     }
   }
 }, true);

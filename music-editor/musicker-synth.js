@@ -70,6 +70,7 @@
         return eventList;
     };
     Synth.prototype.schedule = function(noteList, bpm) {
+        bpm = bpm > 0 ? bpm : 120;
         var eventList = this.generateEventList(noteList, bpm);
         var startTime = this.context.currentTime + 0.01;
 
