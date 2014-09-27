@@ -5,8 +5,6 @@
     var Musicker = exports.Musicker || {};
     exports.Musicker = Musicker;
 
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-
     function Synth(context) {
         this.context = context;
         this.voices = [];
