@@ -14,6 +14,7 @@ var bpmInput = document.querySelector("#bpm-input");
 var playing = false;
 
 function play() {
+  stop();
   playing = true;
   synth.schedule(editor.noteList, +bpmInput.value);
 }
@@ -22,8 +23,14 @@ function stop() {
   synth.halt();
 }
 
-playButton.onclick = play;
-stopButton.onclick = stop;
+playButton.onclick = function() {
+  synth.output.disconnect();
+  synth.output.connect(audioContext.destination);
+  play();
+};
+stopButton.onclick = function() {
+  stop();
+};
 
 // Play/Stop with space bar
 var spaceDown = false;
@@ -51,7 +58,8 @@ var recorder = null;
 var loadMicrophoneButton = document.querySelector("#load-microphone-button");
 var recordButton = document.querySelector("#record-button");
 var vocodeButton = document.querySelector("#vocode-button");
-var vocoder = new Musicker.Vocoder(audioContext);
+var vocoder = new Musicker.Vocoder(audioContext, { qCoeff: 0.5 });
+vocoder.output.gain.value = 0.1;
 var vocoderConnected = false;
 
 function loadMicrophone() {
@@ -85,17 +93,13 @@ recordButton.onclick = recordMicrophone;
 
 // vocoder part
 function vocodeRecording() {
-    if (!vocoderConnected) {
-        vocoderConnected = true;
+    recorder.getBufferSource(function(bufferSource) {
+        vocoder.output.disconnect();
+        synth.output.disconnect();
         vocoder.output.connect(audioContext.destination);
         synth.output.connect(vocoder.carrierInput);
-    }
-    recorder.getBufferSource(function(bufferSource) {
-        var inp = vocoder.modulatorInput;
-        bufferSource.connect(inp);
-        bufferSource.onended = function() { this.disconnect(inp) };
+        bufferSource.connect(vocoder.modulatorInput);
         bufferSource.start(0);
-        bufferSource.stop(10);
         play();
     });
 }

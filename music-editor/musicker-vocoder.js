@@ -79,8 +79,9 @@
 
 
     // Vocoder
-    var Voc = function(context, numBands) {
-        numBands = numBands || 32;
+    var Voc = function(context, opts) {
+        var numBands = opts.numBands || 32;
+        var qCoeff = opts.qCoeff > 0 ? opts.qCoeff : 1;
 
         /// Components
         this.context = context;
@@ -95,6 +96,7 @@
         this.modulatorInput = this.modulatorGain;
         this.modulator = null;
         this.numBands = numBands;
+        this.qCoeff = qCoeff;
         /// Configuration
         this.freqBounds = this.getFrequencyBounds(200, 5000, numBands);
         this.initGainsAndFilters();
@@ -117,7 +119,7 @@
             var bandwidth = (this.freqBounds[i+1] - this.freqBounds[i]);
 
             /// Envelope follower
-            var envelope = vocoderVUMeter(context, f0, bandwidth);
+            var envelope = vocoderVUMeter(context, f0, this.qCoeff * bandwidth);
             this.modulatorGain.connect(envelope.input);
             this.modulatorEnvelopes.push(envelope);
 
