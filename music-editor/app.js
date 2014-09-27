@@ -5,7 +5,7 @@ editorNode.scrollTop = (editor.height - editorNode.offsetHeight) / 2;
 
 var audioContext = new AudioContext();
 var synth = new Musicker.Synth(audioContext);
-synth.output.connect(audioContext.destination);
+// synth.output.connect(audioContext.destination);
 
 var playButton = document.querySelector("#play-button");
 var stopButton = document.querySelector("#stop-button");
@@ -50,6 +50,9 @@ var recording = false;
 var recorder = null;
 var loadMicrophoneButton = document.querySelector("#load-microphone-button");
 var recordButton = document.querySelector("#record-button");
+var vocodeButton = document.querySelector("#vocode-button");
+var vocoder = new Musicker.Vocoder(audioContext);
+var vocoderConnected = false;
 
 function loadMicrophone() {
     if (microphone) return;
@@ -74,13 +77,26 @@ function recordMicrophone() {
     } else {
         recording = false;
         this.textContent = "Record";
-
         recorder.stop();
-        recorder.getBufferSource(function(bufferSource) {
-            bufferSource.connect(bufferSource.context.destination);
-            bufferSource.start(0);
-        });
     }
 
 }
 recordButton.onclick = recordMicrophone;
+
+// vocoder part
+function vocodeRecording() {
+    if (!vocoderConnected) {
+        vocoderConnected = true;
+        vocoder.output.connect(audioContext.destination);
+        synth.output.connect(vocoder.carrierInput);
+    }
+    recorder.getBufferSource(function(bufferSource) {
+        var inp = vocoder.modulatorInput;
+        bufferSource.connect(inp);
+        bufferSource.onended = function() { this.disconnect(inp) };
+        bufferSource.start(0);
+        bufferSource.stop(10);
+        play();
+    });
+}
+vocodeButton.onclick = vocodeRecording;

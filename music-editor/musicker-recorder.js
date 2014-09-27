@@ -27,6 +27,10 @@
         this.bufferDirty = true;
         this.recorderjs.stop();
     };
+    Recorder.prototype.clear = function() {
+        this.bufferDirty = true;
+        this.recorderjs.clear();
+    }
     Recorder.prototype.getBuffer = function(callback) {
         if (this.bufferDirty) {
             var self = this;

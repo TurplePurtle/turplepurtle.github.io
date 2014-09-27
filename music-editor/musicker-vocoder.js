@@ -102,6 +102,7 @@
 
     Voc.prototype.initGainsAndFilters = function() {
         var numBands = this.numBands;
+        var context = this.context;
 
         this.gain.gain.value = 1;
         this.carrierGain.gain.value = 1;
