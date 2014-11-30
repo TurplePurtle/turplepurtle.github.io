@@ -3,22 +3,31 @@
 "use strict";
 
 var N = 30;
-var size = (N + 2)*(N + 2);
-function xy2i(x, y) { return (32*y + x)|0; }
+var SIZE = (N + 2)*(N + 2);
+function IX(x, y) { return (N+2)*y + x |0; }
 
-var u = new Float64Array(size);
-var v = new Float64Array(size);
-var u0 = new Float64Array(size);
-var v0 = new Float64Array(size);
-var q = new Float64Array(size);
-var q0 = new Float64Array(size);
+var FloatArray = Float64Array;
 
-var fpsEl = document.querySelector("#fps");
+var u = new FloatArray(SIZE);
+var v = new FloatArray(SIZE);
+var u0 = new FloatArray(SIZE);
+var v0 = new FloatArray(SIZE);
+var q = new FloatArray(SIZE);
+var q0 = new FloatArray(SIZE);
+var zeros = new FloatArray(SIZE);
+
 var ctx = document.querySelector("#canvas").getContext("2d");
-ctx.canvas.width = 600;
-ctx.canvas.height = 600;
-ctx.transform(ctx.canvas.width/N,0,0,-ctx.canvas.height/N,0,ctx.canvas.height);
+var CANVAS_SIZE = 600;
+var CANVAS_SCALE = CANVAS_SIZE / N;
+ctx.canvas.width = ctx.canvas.height = CANVAS_SIZE;
+ctx.scale(CANVAS_SCALE,CANVAS_SCALE);
+var fpsEl = document.querySelector("#fps");
 var lastT = 0;
+var userInput = {
+  x: 0,
+  y: 0,
+  active: false,
+};
 
 function addSource(N, x, s, dt) {
     var len = ((N+2)*(N+2))|0;
@@ -34,9 +43,9 @@ function diffuse(N, bnd, x, x0, rate, dt) {
     for (var k=0; k<20; k++) {
         for (var j=1; j<=N; j++) {
             for (var i=1; i<=N; i++) {
-                x[xy2i(i,j)] = (x0[xy2i(i,j)] + a * (
-                        x[xy2i(i-1,j)] + x[xy2i(i+1,j)] +
-                        x[xy2i(i,j-1)] + x[xy2i(i,j+1)])) * denom;
+                x[IX(i,j)] = (x0[IX(i,j)] + a * (
+                        x[IX(i-1,j)] + x[IX(i+1,j)] +
+                        x[IX(i,j-1)] + x[IX(i,j+1)])) * denom;
             }
         }
         setBound(N, bnd, x);
@@ -48,8 +57,8 @@ function advect(N, bnd, x, x0, u, v, dt) {
 
     for (var j=1; j<=N; j++) {
         for (var i=1; i<=N; i++) {
-            var x = i - dt0 * u[xy2i(i,j)];
-            var y = j - dt0 * v[xy2i(i,j)];
+            var x = i - dt0 * u[IX(i,j)];
+            var y = j - dt0 * v[IX(i,j)];
             if (x < 0.5) x = 0.5;
             else if (x > N+0.5) x = N + 0.5;
             if (y < 0.5) y = 0.5;
@@ -58,8 +67,8 @@ function advect(N, bnd, x, x0, u, v, dt) {
             var j0 = y|0, j1 = j0 + 1;
             var s1 = x - i0, s0 = 1 - s1;
             var t1 = y - j0, t0 = 1 - t1;
-            x[xy2i(i,j)] = s0*(t0*x0[xy2i(i0,j0)] + t1*x0[xy2i(i0,j1)])
-                         + s1*(t0*x0[xy2i(i1,j0)] + t1*x0[xy2i(i1,j1)]);
+            x[IX(i,j)] = s0*(t0*x0[IX(i0,j0)] + t1*x0[IX(i0,j1)])
+                         + s1*(t0*x0[IX(i1,j0)] + t1*x0[IX(i1,j1)]);
         }
     }
     setBound(N, bnd, x);
@@ -67,32 +76,32 @@ function advect(N, bnd, x, x0, u, v, dt) {
 
 function project(N, u, v, p, div) {
     var h = 1/N;
-    
+
     for (var j=1; j<=N; j++) {
         for (var i=1; i<=N; i++) {
-            div[xy2i(i,j)] = -0.5*h*(u[xy2i(i+1,j)] - u[xy2i(i-1,j)] +
-                                     v[xy2i(i,j+1)] - v[xy2i(i,j-1)]);
-            p[xy2i(i,j)] = 0;
+            div[IX(i,j)] = -0.5*h*(u[IX(i+1,j)] - u[IX(i-1,j)] +
+                                     v[IX(i,j+1)] - v[IX(i,j-1)]);
+            p[IX(i,j)] = 0;
         }
     }
     setBound(N, 0, div);
     setBound(N, 0, p);
-    
+
     for (var k=0; k<20; k++) {
         for (var j=1; j<=N; j++) {
             for (var i=1; i<=N; i++) {
-                p[xy2i(i,j)] = 0.25*(div[xy2i(i,j)] +
-                                     p[xy2i(i-1,j)] + p[xy2i(i+1,j)] +
-                                     p[xy2i(i,j-1)] + p[xy2i(i,j+1)]);
+                p[IX(i,j)] = 0.25*(div[IX(i,j)] +
+                                     p[IX(i-1,j)] + p[IX(i+1,j)] +
+                                     p[IX(i,j-1)] + p[IX(i,j+1)]);
             }
         }
         setBound(N, 0, p);
     }
-    
+
     for (var j=1; j<=N; j++) {
         for (var i=1; i<=N; i++) {
-            u[xy2i(i,j)] -= 0.5*N*(p[xy2i(i+1,j)] - p[xy2i(i-1,j)]);
-            v[xy2i(i,j)] -= 0.5*N*(p[xy2i(i,j+1)] - p[xy2i(i,j-1)]);
+            u[IX(i,j)] -= 0.5*N*(p[IX(i+1,j)] - p[IX(i-1,j)]);
+            v[IX(i,j)] -= 0.5*N*(p[IX(i,j+1)] - p[IX(i,j-1)]);
         }
     }
     setBound(N, 1, u);
@@ -101,15 +110,15 @@ function project(N, u, v, p, div) {
 
 function setBound(N, b, x) {
     for (var i=1; i<=N; i++) {
-        x[xy2i(  0,  i)] = b==1 ? -x[xy2i(1,i)] : x[xy2i(1,i)];
-        x[xy2i(N+1,  i)] = b==1 ? -x[xy2i(N,i)] : x[xy2i(N,i)];
-        x[xy2i(  i,  0)] = b==2 ? -x[xy2i(i,1)] : x[xy2i(i,1)];
-        x[xy2i(  i,N+1)] = b==2 ? -x[xy2i(i,N)] : x[xy2i(i,N)];
+        x[IX(  0,  i)] = b==1 ? -x[IX(1,i)] : x[IX(1,i)];
+        x[IX(N+1,  i)] = b==1 ? -x[IX(N,i)] : x[IX(N,i)];
+        x[IX(  i,  0)] = b==2 ? -x[IX(i,1)] : x[IX(i,1)];
+        x[IX(  i,N+1)] = b==2 ? -x[IX(i,N)] : x[IX(i,N)];
     }
-    x[xy2i(  0,  0)] = 0.5*(x[xy2i(1,  0)] + x[xy2i(  0,1)]);
-    x[xy2i(  0,N+1)] = 0.5*(x[xy2i(1,N+1)] + x[xy2i(  0,N)]);
-    x[xy2i(N+1,  0)] = 0.5*(x[xy2i(N,  0)] + x[xy2i(N+1,1)]);
-    x[xy2i(N+1,N+1)] = 0.5*(x[xy2i(N,N+1)] + x[xy2i(N+1,N)]);
+    x[IX(  0,  0)] = 0.5*(x[IX(1,  0)] + x[IX(  0,1)]);
+    x[IX(  0,N+1)] = 0.5*(x[IX(1,N+1)] + x[IX(  0,N)]);
+    x[IX(N+1,  0)] = 0.5*(x[IX(N,  0)] + x[IX(N+1,1)]);
+    x[IX(N+1,N+1)] = 0.5*(x[IX(N,N+1)] + x[IX(N+1,N)]);
 }
 
 function vStep(N, u, v, u0, v0, visc, dt) {
@@ -138,37 +147,50 @@ function qStep(N, x, x0, u, v, kDiff, dt) {
 }
 
 function qDraw(N, ctx, x, scale) {
-    ctx.clearRect(0,0,N,N);
+    // ctx.clearRect(0,0,N,N);
+    // for (var j=0; j<N; j++) {
+    //     for (var i=0; i<N; i++) {
+    //         var val = Math.min(scale * x[IX(i+1, j+1)], 1).toFixed(3);
+    //         ctx.fillStyle = "rgba(150,200,0," + val + ")";
+    //         ctx.fillRect(i, j, 1, 1);
+    //     }
+    // }
+    var imgData = ctx.getImageData(0,0,N,N);
     for (var j=0; j<N; j++) {
-        for (var i=0; i<N; i++) {
-            var val = Math.min(scale * x[xy2i(i+1, j+1)], 1).toFixed(3);
-            ctx.fillStyle = "rgba(150,200,0," + val + ")";
-            ctx.fillRect(i, j, 1, 1);
-        }
+      for (var i=0; i<N; i++) {
+        var ind = 4*(j*N + i);
+        var qInd = IX(i+1,j+1);
+        imgData.data[ind  ] = 150;
+        imgData.data[ind+1] = 200;
+        imgData.data[ind+2] = 0;
+        imgData.data[ind+3] = scale*x[qInd];
+      }
     }
+    ctx.putImageData(imgData,0,0);
 }
 
-    // v0[xy2i(3,4)] = 3;
+function setFields(q0, u0, v0) {
+  q0.set(zeros);
+  u0.set(zeros);
+  v0.set(zeros);
+
+  if (userInput.active) {
+    var x = userInput.x, y = userInput.y;
+    q0[IX(x,y)] = 10;
+    u0[IX(x,y)] = 10;
+  }
+}
 
 function tick(t) {
     var dt = 0.001*(t - lastT);
     lastT = t;
 
-    // for (var i=0; i<size; i++)
-        // q0[i] = 0;
-    q0[xy2i(3,3)] = 1;
-        
-    // for (var i=0; i<size; i++)
-        // u0[i] = 0;
-    u0[xy2i(3,4)] += 30;
-    // for (var i=0; i<size; i++)
-        // v0[i] = 0;
-
+    setFields(q0, u0, v0);
     vStep(N, u, v, u0, v0, 1e-5, dt);
     qStep(N, q, q0, u, v, 1e-4, dt);
-    qDraw(N, ctx, u, 100);
+    qDraw(N, ctx, q, 100);
 
-    fpsEl.textContent = (1/dt).toFixed(2);
+    fpsEl.textContent = (dt).toFixed(2);
     requestAnimationFrame(tick);
 }
 
@@ -176,5 +198,20 @@ requestAnimationFrame(function(t) {
     lastT = t;
     requestAnimationFrame(tick);
 });
+
+function getInputXY(e) {
+  if (userInput.active) {
+    userInput.x = (e.layerX / CANVAS_SCALE |0) + 1;
+    userInput.y = (e.layerY / CANVAS_SCALE |0) + 1;
+  }
+}
+ctx.canvas.addEventListener("mousedown", function(e) {
+  userInput.active = true;
+  getInputXY(e);
+})
+ctx.canvas.addEventListener("mousemove", getInputXY);
+window.addEventListener("mouseup", function(e) {
+  userInput.active = false;
+})
 
 })();
