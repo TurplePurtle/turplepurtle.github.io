@@ -2,7 +2,7 @@
 
 "use strict";
 
-var N = 30;
+var N = 62;
 var SIZE = (N + 2)*(N + 2);
 function IX(x, y) { return (N+2)*y + x |0; }
 
@@ -16,59 +16,60 @@ var q = new FloatArray(SIZE);
 var q0 = new FloatArray(SIZE);
 var zeros = new FloatArray(SIZE);
 
-var ctx = document.querySelector("#canvas").getContext("2d");
-var CANVAS_SIZE = 600;
-var CANVAS_SCALE = CANVAS_SIZE / N;
-ctx.canvas.width = ctx.canvas.height = CANVAS_SIZE;
-ctx.scale(CANVAS_SCALE,CANVAS_SCALE);
+var num_iter = 12;
+
+var ctx = document.querySelector("#canvas").getContext("2d",{alpha:false});
+ctx.canvas.width = ctx.canvas.height = N;
 var fpsEl = document.querySelector("#fps");
+var fps = 0;
 var lastT = 0;
 var userInput = {
-  x: 0,
-  y: 0,
-  active: false,
+    x: 0,
+    y: 0,
+    i: 0,
+    j: 0,
+    u: 0,
+    v: 0,
+    active: false,
 };
 
-function addSource(N, x, s, dt) {
+function addSource(N, q, q0, dt) {
     var len = ((N+2)*(N+2))|0;
     for (var i=0; i < len; i++) {
-        x[i] += s[i] * dt;
+        q[i] += q0[i] * dt;
     }
 }
 
-function diffuse(N, bnd, x, x0, rate, dt) {
+function diffuse(N, bnd, q, q0, rate, dt) {
     var a = N*N*rate*dt;
     var denom = 1/(1+4*a);
 
-    for (var k=0; k<20; k++) {
+    for (var k=0; k<num_iter; k++) {
         for (var j=1; j<=N; j++) {
             for (var i=1; i<=N; i++) {
-                x[IX(i,j)] = (x0[IX(i,j)] + a * (
-                        x[IX(i-1,j)] + x[IX(i+1,j)] +
-                        x[IX(i,j-1)] + x[IX(i,j+1)])) * denom;
+                q[IX(i,j)] = denom*(q0[IX(i,j)] +
+                             a*(q[IX(i-1,j)] + q[IX(i+1,j)] +
+                                q[IX(i,j-1)] + q[IX(i,j+1)]));
             }
         }
-        setBound(N, bnd, x);
+        setBound(N, bnd, q);
     }
 }
 
-function advect(N, bnd, x, x0, u, v, dt) {
-    var dt0 = N*dt;
-
+function advect(N, bnd, q, q0, u, v, dt) {
     for (var j=1; j<=N; j++) {
         for (var i=1; i<=N; i++) {
-            var x = i - dt0 * u[IX(i,j)];
-            var y = j - dt0 * v[IX(i,j)];
-            if (x < 0.5) x = 0.5;
-            else if (x > N+0.5) x = N + 0.5;
-            if (y < 0.5) y = 0.5;
-            else if (y > N+0.5) y = N + 0.5;
+            var ind = IX(i,j);
+            var x = i - dt*N * u[ind];
+            var y = j - dt*N * v[ind];
+            x = Math.min(Math.max(x, 0), N+1);
+            y = Math.min(Math.max(y, 0), N+1);
             var i0 = x|0, i1 = i0 + 1;
             var j0 = y|0, j1 = j0 + 1;
-            var s1 = x - i0, s0 = 1 - s1;
-            var t1 = y - j0, t0 = 1 - t1;
-            x[IX(i,j)] = s0*(t0*x0[IX(i0,j0)] + t1*x0[IX(i0,j1)])
-                         + s1*(t0*x0[IX(i1,j0)] + t1*x0[IX(i1,j1)]);
+            q[ind] = q0[IX(i0,j0)]*(i1-x)*(j1-y)
+                   + q0[IX(i1,j0)]*(x-i0)*(j1-y)
+                   + q0[IX(i0,j1)]*(i1-x)*(y-j0)
+                   + q0[IX(i1,j1)]*(x-i0)*(y-j0);
         }
     }
     setBound(N, bnd, x);
@@ -80,19 +81,19 @@ function project(N, u, v, p, div) {
     for (var j=1; j<=N; j++) {
         for (var i=1; i<=N; i++) {
             div[IX(i,j)] = -0.5*h*(u[IX(i+1,j)] - u[IX(i-1,j)] +
-                                     v[IX(i,j+1)] - v[IX(i,j-1)]);
+            v[IX(i,j+1)] - v[IX(i,j-1)]);
             p[IX(i,j)] = 0;
         }
     }
     setBound(N, 0, div);
     setBound(N, 0, p);
 
-    for (var k=0; k<20; k++) {
+    for (var k=0; k<num_iter; k++) {
         for (var j=1; j<=N; j++) {
             for (var i=1; i<=N; i++) {
                 p[IX(i,j)] = 0.25*(div[IX(i,j)] +
-                                     p[IX(i-1,j)] + p[IX(i+1,j)] +
-                                     p[IX(i,j-1)] + p[IX(i,j+1)]);
+                p[IX(i-1,j)] + p[IX(i+1,j)] +
+                p[IX(i,j-1)] + p[IX(i,j+1)]);
             }
         }
         setBound(N, 0, p);
@@ -140,45 +141,36 @@ function vStep(N, u, v, u0, v0, visc, dt) {
 function qStep(N, x, x0, u, v, kDiff, dt) {
     var tmp;
     addSource(N, x, x0, dt);
-    tmp=x; x=x0; x0=tmp;
-    diffuse(N, 0, x, x0, kDiff, dt);
-    tmp=x; x=x0; x0=tmp;
+    diffuse(N, 0, x0, x, kDiff, dt);
     advect(N, 0, x, x0, u, v, dt);
 }
 
-function qDraw(N, ctx, x, scale) {
-    // ctx.clearRect(0,0,N,N);
-    // for (var j=0; j<N; j++) {
-    //     for (var i=0; i<N; i++) {
-    //         var val = Math.min(scale * x[IX(i+1, j+1)], 1).toFixed(3);
-    //         ctx.fillStyle = "rgba(150,200,0," + val + ")";
-    //         ctx.fillRect(i, j, 1, 1);
-    //     }
-    // }
+function qDraw(N, ctx, r,g,b, scale) {
     var imgData = ctx.getImageData(0,0,N,N);
     for (var j=0; j<N; j++) {
-      for (var i=0; i<N; i++) {
-        var ind = 4*(j*N + i);
-        var qInd = IX(i+1,j+1);
-        imgData.data[ind  ] = 150;
-        imgData.data[ind+1] = 200;
-        imgData.data[ind+2] = 0;
-        imgData.data[ind+3] = scale*x[qInd];
-      }
+        for (var i=0; i<N; i++) {
+            var ind = 4*(j*N + i);
+            var qInd = IX(i+1,j+1);
+            imgData.data[ind  ] = scale*Math.abs(r[qInd]);
+            imgData.data[ind+1] = scale*Math.abs(g[qInd]);
+            imgData.data[ind+2] = scale*Math.abs(b[qInd]);
+            imgData.data[ind+3] = 255;
+        }
     }
     ctx.putImageData(imgData,0,0);
 }
 
 function setFields(q0, u0, v0) {
-  q0.set(zeros);
-  u0.set(zeros);
-  v0.set(zeros);
+    q0.set(zeros);
+    u0.set(zeros);
+    v0.set(zeros);
 
-  if (userInput.active) {
-    var x = userInput.x, y = userInput.y;
-    q0[IX(x,y)] = 10;
-    u0[IX(x,y)] = 10;
-  }
+    if (userInput.active) {
+        var ind = IX(userInput.i, userInput.j);
+        q0[ind] = 300;
+        u0[ind] = userInput.u;
+        v0[ind] = userInput.v;
+    }
 }
 
 function tick(t) {
@@ -186,11 +178,12 @@ function tick(t) {
     lastT = t;
 
     setFields(q0, u0, v0);
-    vStep(N, u, v, u0, v0, 1e-5, dt);
+    vStep(N, u, v, u0, v0, 1e-2, dt);
     qStep(N, q, q0, u, v, 1e-4, dt);
-    qDraw(N, ctx, q, 100);
+    qDraw(N, ctx, q,u,v, 100);
 
-    fpsEl.textContent = (dt).toFixed(2);
+    fps = 0.02/dt + 0.98*fps;
+    fpsEl.textContent = fps.toFixed(1);
     requestAnimationFrame(tick);
 }
 
@@ -200,18 +193,25 @@ requestAnimationFrame(function(t) {
 });
 
 function getInputXY(e) {
-  if (userInput.active) {
-    userInput.x = (e.layerX / CANVAS_SCALE |0) + 1;
-    userInput.y = (e.layerY / CANVAS_SCALE |0) + 1;
-  }
+    var x = e.layerX;
+    var y = e.layerY;
+    userInput.u = 100*(x - userInput.x);
+    userInput.v = 100*(y - userInput.y);
+    userInput.x = x;
+    userInput.y = y;
+    userInput.i = (x * N / ctx.canvas.offsetWidth |0) + 1;
+    userInput.j = (y * N / ctx.canvas.offsetHeight |0) + 1;
 }
 ctx.canvas.addEventListener("mousedown", function(e) {
-  userInput.active = true;
-  getInputXY(e);
+    userInput.active = true;
+    getInputXY(e);
 })
-ctx.canvas.addEventListener("mousemove", getInputXY);
+ctx.canvas.addEventListener("mousemove", function(e) {
+    getInputXY(e);
+    console.log(userInput.u,userInput.v);
+});
 window.addEventListener("mouseup", function(e) {
-  userInput.active = false;
+    userInput.active = false;
 })
 
 })();
