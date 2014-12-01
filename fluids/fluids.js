@@ -5,6 +5,7 @@
 var N = 62;
 var SIZE = (N + 2)*(N + 2);
 function IX(x, y) { return (N+2)*y + x |0; }
+function clamp(val,min,max) { return Math.min(Math.max(val,min),max); }
 
 var FloatArray = Float64Array;
 
@@ -16,7 +17,7 @@ var q = new FloatArray(SIZE);
 var q0 = new FloatArray(SIZE);
 var zeros = new FloatArray(SIZE);
 
-var num_iter = 12;
+var num_iter = 10;
 
 var ctx = document.querySelector("#canvas").getContext("2d",{alpha:false});
 ctx.canvas.width = ctx.canvas.height = N;
@@ -62,8 +63,8 @@ function advect(N, bnd, q, q0, u, v, dt) {
             var ind = IX(i,j);
             var x = i - dt*N * u[ind];
             var y = j - dt*N * v[ind];
-            x = Math.min(Math.max(x, 0), N+1);
-            y = Math.min(Math.max(y, 0), N+1);
+            x = clamp(x,0,N+0.99);
+            y = clamp(y,0,N+0.99);
             var i0 = x|0, i1 = i0 + 1;
             var j0 = y|0, j1 = j0 + 1;
             q[ind] = q0[IX(i0,j0)]*(i1-x)*(j1-y)
@@ -145,15 +146,18 @@ function qStep(N, x, x0, u, v, kDiff, dt) {
     advect(N, 0, x, x0, u, v, dt);
 }
 
-function qDraw(N, ctx, r,g,b, scale) {
+function qDraw(N, ctx, q, scale) {
     var imgData = ctx.getImageData(0,0,N,N);
+    var kr = scale*1.0;
+    var kg = scale*0.0;
+    var kb = scale*0.5;
     for (var j=0; j<N; j++) {
         for (var i=0; i<N; i++) {
             var ind = 4*(j*N + i);
             var qInd = IX(i+1,j+1);
-            imgData.data[ind  ] = scale*Math.abs(r[qInd]);
-            imgData.data[ind+1] = scale*Math.abs(g[qInd]);
-            imgData.data[ind+2] = scale*Math.abs(b[qInd]);
+            imgData.data[ind  ] = kr * q[qInd];
+            imgData.data[ind+1] = kg * q[qInd];
+            imgData.data[ind+2] = kb * q[qInd];
             imgData.data[ind+3] = 255;
         }
     }
@@ -178,9 +182,9 @@ function tick(t) {
     lastT = t;
 
     setFields(q0, u0, v0);
-    vStep(N, u, v, u0, v0, 1e-2, dt);
+    vStep(N, u, v, u0, v0, 1e-4, dt);
     qStep(N, q, q0, u, v, 1e-4, dt);
-    qDraw(N, ctx, q,u,v, 100);
+    qDraw(N, ctx, q, 100);
 
     fps = 0.02/dt + 0.98*fps;
     fpsEl.textContent = fps.toFixed(1);
@@ -195,12 +199,12 @@ requestAnimationFrame(function(t) {
 function getInputXY(e) {
     var x = e.layerX;
     var y = e.layerY;
-    userInput.u = 100*(x - userInput.x);
-    userInput.v = 100*(y - userInput.y);
+    userInput.u = 40*(x - userInput.x);
+    userInput.v = 40*(x - userInput.x);
     userInput.x = x;
     userInput.y = y;
-    userInput.i = (x * N / ctx.canvas.offsetWidth |0) + 1;
-    userInput.j = (y * N / ctx.canvas.offsetHeight |0) + 1;
+    userInput.i = clamp((x*N/ctx.canvas.offsetWidth |0) + 1, 1, N);
+    userInput.j = clamp((y*N/ctx.canvas.offsetHeight |0) + 1 ,1, N);
 }
 ctx.canvas.addEventListener("mousedown", function(e) {
     userInput.active = true;
@@ -208,8 +212,10 @@ ctx.canvas.addEventListener("mousedown", function(e) {
 })
 ctx.canvas.addEventListener("mousemove", function(e) {
     getInputXY(e);
-    console.log(userInput.u,userInput.v);
 });
+ctx.canvas.addEventListener("mouseout", function(e) {
+    userInput.u = userInput.v = 0;
+})
 window.addEventListener("mouseup", function(e) {
     userInput.active = false;
 })
