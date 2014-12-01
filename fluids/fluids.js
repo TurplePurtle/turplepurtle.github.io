@@ -15,6 +15,7 @@ var u0 = new FloatArray(SIZE);
 var v0 = new FloatArray(SIZE);
 var q = new FloatArray(SIZE);
 var q0 = new FloatArray(SIZE);
+var bnd = new Int8Array(SIZE);
 var zeros = new FloatArray(SIZE);
 
 var num_iter = 10;
@@ -32,7 +33,15 @@ var userInput = {
     u: 0,
     v: 0,
     active: false,
+    type: 0,
 };
+
+function resetBoundary() {
+    bnd.set(zeros);
+    for (var i=0; i<N+2; i++) {
+        bnd[IX(i,0)] = bnd[IX(i,N+1)] = bnd[IX(0,i)] = bnd[IX(N+1,i)] = 1;
+    }
+}
 
 function addSource(N, q, q0, dt) {
     var len = ((N+2)*(N+2))|0;
@@ -111,16 +120,28 @@ function project(N, u, v, p, div) {
 }
 
 function setBound(N, b, x) {
-    for (var i=1; i<=N; i++) {
-        x[IX(  0,  i)] = b==1 ? -x[IX(1,i)] : x[IX(1,i)];
-        x[IX(N+1,  i)] = b==1 ? -x[IX(N,i)] : x[IX(N,i)];
-        x[IX(  i,  0)] = b==2 ? -x[IX(i,1)] : x[IX(i,1)];
-        x[IX(  i,N+1)] = b==2 ? -x[IX(i,N)] : x[IX(i,N)];
+    // for (var i=1; i<=N; i++) {
+    //     x[IX(  0,  i)] = b==1 ? -x[IX(1,i)] : x[IX(1,i)];
+    //     x[IX(N+1,  i)] = b==1 ? -x[IX(N,i)] : x[IX(N,i)];
+    //     x[IX(  i,  0)] = b==2 ? -x[IX(i,1)] : x[IX(i,1)];
+    //     x[IX(  i,N+1)] = b==2 ? -x[IX(i,N)] : x[IX(i,N)];
+    // }
+    // x[IX(  0,  0)] = 0.5*(x[IX(1,  0)] + x[IX(  0,1)]);
+    // x[IX(  0,N+1)] = 0.5*(x[IX(1,N+1)] + x[IX(  0,N)]);
+    // x[IX(N+1,  0)] = 0.5*(x[IX(N,  0)] + x[IX(N+1,1)]);
+    // x[IX(N+1,N+1)] = 0.5*(x[IX(N,N+1)] + x[IX(N+1,N)]);
+
+    for (var i=0; i<x.length; i++) {
+        if (bnd[i] > 0) {
+            x[i] = 0;
+        }
     }
-    x[IX(  0,  0)] = 0.5*(x[IX(1,  0)] + x[IX(  0,1)]);
-    x[IX(  0,N+1)] = 0.5*(x[IX(1,N+1)] + x[IX(  0,N)]);
-    x[IX(N+1,  0)] = 0.5*(x[IX(N,  0)] + x[IX(N+1,1)]);
-    x[IX(N+1,N+1)] = 0.5*(x[IX(N,N+1)] + x[IX(N+1,N)]);
+    // for (var i=0; i<N+2; i++) {
+    //     x[IX(  0,  i)] = 0;
+    //     x[IX(N+1,  i)] = 0;
+    //     x[IX(  i,  0)] = 0;
+    //     x[IX(  i,N+1)] = 0;
+    // }
 }
 
 function vStep(N, u, v, u0, v0, visc, dt) {
@@ -155,10 +176,17 @@ function qDraw(N, ctx, q, scale) {
         for (var i=0; i<N; i++) {
             var ind = 4*(j*N + i);
             var qInd = IX(i+1,j+1);
-            imgData.data[ind  ] = kr * q[qInd];
-            imgData.data[ind+1] = kg * q[qInd];
-            imgData.data[ind+2] = kb * q[qInd];
-            imgData.data[ind+3] = 255;
+            if (bnd[qInd] > 0) {
+                imgData.data[ind  ] = 255;
+                imgData.data[ind+1] = 255;
+                imgData.data[ind+2] = 255;
+                imgData.data[ind+3] = 255;
+            } else {
+                imgData.data[ind  ] = kr * q[qInd];
+                imgData.data[ind+1] = kg * q[qInd];
+                imgData.data[ind+2] = kb * q[qInd];
+                imgData.data[ind+3] = 255;
+            }
         }
     }
     ctx.putImageData(imgData,0,0);
@@ -171,9 +199,17 @@ function setFields(q0, u0, v0) {
 
     if (userInput.active) {
         var ind = IX(userInput.i, userInput.j);
-        q0[ind] = 300;
-        u0[ind] = userInput.u;
-        v0[ind] = userInput.v;
+
+        switch (userInput.type) {
+        case 0:
+            q0[ind] = 10*N;
+            u0[ind] = userInput.u;
+            v0[ind] = userInput.v;
+            break;
+        case 1:
+            bnd[ind] = 1;
+            break;
+        }
     }
 }
 
@@ -195,6 +231,10 @@ requestAnimationFrame(function(t) {
     lastT = t;
     requestAnimationFrame(tick);
 });
+
+function switchInputType(t) {
+    userInput.type = t;
+}
 
 function getInputXY(e) {
     var x = e.layerX;
@@ -219,5 +259,14 @@ ctx.canvas.addEventListener("mouseout", function(e) {
 window.addEventListener("mouseup", function(e) {
     userInput.active = false;
 })
+document.querySelector("#substance-button").addEventListener("click", function(e) {
+    switchInputType(0);
+});
+document.querySelector("#wall-button").addEventListener("click", function(e) {
+    switchInputType(1);
+});
+document.querySelector("#wall-clear-button").addEventListener("click", function(e) {
+    resetBoundary();
+});
 
 })();
