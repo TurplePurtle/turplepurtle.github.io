@@ -214,7 +214,7 @@ sim.setFields = function(q0, u0, v0) {
             v0[ind] = userInput.v;
             break;
         case 1:
-            bnd[ind] = 1;
+            sim.bnd[ind] = 1;
             break;
         }
     }
