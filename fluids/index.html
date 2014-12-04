@@ -3,15 +3,32 @@
 <title>FluidSim</title>
 <style>
 body {
-  background-color: #eee;
+  background-color: #333;
+  color: #eee;
+  font-family: Arial, Helvetica, Verdana, sans-serif;
 }
 #container {
   position: relative;
-}
-#canvas {
-  outline: 1px solid #000;
+  margin: 16px auto 0;
   width: 600px;
-  height: 600px;
+}
+#stage {
+  outline: 1px solid #000;
+  width: 100%;
+}
+.col0, .col1 {
+  width: 300px;
+  margin: 0;
+  padding: 8px 4px;
+}
+.col0 {
+    float: left;
+}
+.col1 {
+    margin-left: 300px;
+}
+.sep {
+    clear: both;
 }
 </style>
 </head>
@@ -19,17 +36,69 @@ body {
 <body>
 
 <div id="container">
-  <canvas id="canvas"></canvas>
+
+<canvas id="stage"></canvas>
+
+<p class="col0">
+  <button id="run-button">Run Simulation</button>
+  <button id="pause-button">Pause Simulation</button>
+  <span id="fps">0</span> fps
+</p>
+
+<p class="col1">
+  <label>Gauss-Seidel Iterations
+    <input id="numiter-input" type="text" value="10" />
+  </label>
+</p>
+
+<div class="sep"></div>
+
+<p class="col0">
+  <label>
+    <input id="color-button" type="radio" name="input-type" checked />Add coloring
+  </label>
+  <button id="color-clear-button">Clear coloring</button>
+  <br />
+  <label>
+    <input id="wall-button" type="radio" name="input-type"/>Add walls
+  </label>
+  <button id="wall-clear-button">Clear walls</button>
+  <br />
+  <label>
+    <input id="force-button" type="radio" name="input-type"/>Add permanent forces
+  </label>
+  <br />
+  <label>Force X
+    <input id="force-x-input" type="text" size="3" value="5.0" />
+  </label>
+  <br />
+  <label>Force Y
+    <input id="force-y-input" type="text" size="3" value="0.0" />
+  </label>
+  <br />
+  <button id="forceremove-button">Remove Forces</button>
+</p>
+
+<p class="col1">
+  <label>
+    <input id="boxbnd-button" type="radio" name="bnd-type" checked />Closed Box
+  </label>
+  <br />
+  <label>
+    <input id="tunnelbnd-button" type="radio" name="bnd-type"/>Tunnel
+  </label>
+</p>
+
+<p class="col1">
+  <label>Viscosity
+    <input id="viscosity-input" type="text" value="0.001" />
+  </label><br />
+  <label>Diffusion
+    <input id="diffusion-input" type="text" value="0.001" />
+  </label><br />
+</p>
+
 </div>
-
-<button id="run-button">Run Simulation</button>
-<button id="pause-button">Pause Simulation</button>
-
-<button id="color-button">Add coloring</button>
-<button id="wall-button">Add walls</button>
-<button id="wall-clear-button">Clear walls</button>
-
-<p id="fps"></p>
 
 <script src="fluids.js"></script>
 </body>
