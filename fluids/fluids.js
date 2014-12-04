@@ -288,7 +288,7 @@ sim.setup = function() {
     window.addEventListener("mouseup", function(e) {
         sim.userInput.active = false;
     })
-    document.querySelector("#substance-button").addEventListener("click", function(e) {
+    document.querySelector("#color-button").addEventListener("click", function(e) {
         switchInputType(0);
     });
     document.querySelector("#wall-button").addEventListener("click", function(e) {
