@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Color Table Tool</title>
+<style>
+p {
+  font-family: sans-serif;
+}
+
+#input {
+  display: block;
+  width: 100%;
+}
+
+#save {
+  font-weight: bold;
+}
+
+#output {
+  color: #fff;
+  font-family: "Monaco","Andale Mono","Lucida Console","Bitstream Vera Sans Mono","Courier New",Courier,monospace;
+  font-size: 0.75rem;
+  text-shadow: 1px 1px 1px #000;
+}
+
+#output td {
+  padding: 0.5rem;
+}
+</style>
+</head>
+
+<body>
+
+<p>
+  <small>Paste colors below and click "show". If you make changes, remember to
+    copy them to a local file; this site will <b>not</b> remember or save your
+    input.</small>
+</p>
+<textarea id="input" rows="8">
+#f00 #0f0 #00f
+#fa0 #af0 #0af
+#f0a #a0f #0fa
+</textarea>
+<button id="save" type="button">Show</button> &larr; click here!
+<div id="output"></div>
+
+<script>
+var
+saveButton = document.querySelector("#save"),
+inputEl = document.querySelector("#input"),
+outputEl = document.querySelector("#output");
+
+function generateTable() {
+  var lines = inputEl.value.split("\n");
+
+  var colors = lines.map(function(line) {
+    return line.trim().split(/[^#\w]+/);
+  });
+
+  return colors.reduce(function(table, row) {
+    var rowEl = row.reduce(function(row, color) {
+      var colorEl;
+      colorEl = document.createElement("td");
+      colorEl.textContent = color;
+      colorEl.style.backgroundColor = color;
+      row.appendChild(colorEl);
+      return row;
+    }, document.createElement("tr"));
+
+    table.appendChild(rowEl);
+
+    return table;
+  }, document.createElement("table"));
+}
+
+function generateAndInsertTable() {
+  var table = generateTable();
+  if (outputEl.firstElementChild) {
+    outputEl.replaceChild(table, outputEl.firstElementChild);
+  } else {
+    outputEl.appendChild(table);
+  }
+}
+
+saveButton.addEventListener("click", generateAndInsertTable);
+
+generateAndInsertTable();
+</script>
+
+</body>
+</html>
