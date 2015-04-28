@@ -3,12 +3,17 @@
 <head>
 <title>Color Table Tool</title>
 <style>
+body {
+  font-size: 1.25rem;
+}
+
 p {
   font-family: sans-serif;
 }
 
 #input {
   display: block;
+  font-size: 1.25rem;
   width: 100%;
 }
 
@@ -19,7 +24,6 @@ p {
 #output {
   color: #fff;
   font-family: "Monaco","Andale Mono","Lucida Console","Bitstream Vera Sans Mono","Courier New",Courier,monospace;
-  font-size: 0.75rem;
   text-shadow: 1px 1px 1px #000;
 }
 
@@ -45,6 +49,22 @@ p {
 <div id="output"></div>
 
 <script>
+// http://davidwalsh.name/javascript-debounce-function
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
 var
 saveButton = document.querySelector("#save"),
 inputEl = document.querySelector("#input"),
@@ -82,7 +102,10 @@ function generateAndInsertTable() {
   }
 }
 
+var debouncedFun = debounce(generateAndInsertTable, 500);
+
 saveButton.addEventListener("click", generateAndInsertTable);
+inputEl.addEventListener("keyup", debouncedFun);
 
 generateAndInsertTable();
 </script>
