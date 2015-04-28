@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8"/>
 <title>Color Table Tool</title>
 <style>
 body {
@@ -15,10 +16,6 @@ p {
   display: block;
   font-size: 1.25rem;
   width: 100%;
-}
-
-#save {
-  font-weight: bold;
 }
 
 #output {
@@ -45,7 +42,6 @@ p {
 #fa0 #af0 #0af
 #f0a #a0f #0fa
 </textarea>
-<button id="save" type="button">Show</button> &larr; click here!
 <div id="output"></div>
 
 <script>
@@ -66,7 +62,6 @@ function debounce(func, wait, immediate) {
 };
 
 var
-saveButton = document.querySelector("#save"),
 inputEl = document.querySelector("#input"),
 outputEl = document.querySelector("#output");
 
@@ -104,7 +99,6 @@ function generateAndInsertTable() {
 
 var debouncedFun = debounce(generateAndInsertTable, 500);
 
-saveButton.addEventListener("click", generateAndInsertTable);
 inputEl.addEventListener("keyup", debouncedFun);
 
 generateAndInsertTable();
