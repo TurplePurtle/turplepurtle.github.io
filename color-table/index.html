@@ -33,15 +33,20 @@ p {
 <body>
 
 <p>
-  <small>Paste colors below and click "show". If you make changes, remember to
-    copy them to a local file; this site will <b>not</b> remember or save your
-    input.</small>
+  <small>Paste colors below. You can save your input to local storage by clicking "save".</small>
 </p>
+
+<div id="buttons">
+  <button id="save">Save</button>
+  <button id="load">Load</button>
+</div>
+
 <textarea id="input" rows="8">
 #f00 #0f0 #00f
 #fa0 #af0 #0af
 #f0a #a0f #0fa
 </textarea>
+
 <div id="output"></div>
 
 <script>
@@ -62,6 +67,8 @@ function debounce(func, wait, immediate) {
 };
 
 var
+loadEl = document.querySelector("#load"),
+saveEl = document.querySelector("#save"),
 inputEl = document.querySelector("#input"),
 outputEl = document.querySelector("#output");
 
@@ -97,11 +104,26 @@ function generateAndInsertTable() {
   }
 }
 
+function saveColors() {
+  if (window.localStorage) {
+    localStorage.setItem("colors", inputEl.value);
+  }
+}
+
+function loadColors() {
+  var colors = window.localStorage && localStorage.getItem("colors");
+  if (colors) {
+    inputEl.value = colors;
+  }
+  generateAndInsertTable();
+}
+
 var debouncedFun = debounce(generateAndInsertTable, 500);
 
 inputEl.addEventListener("keyup", debouncedFun);
-
-generateAndInsertTable();
+saveEl.addEventListener("click", saveColors);
+loadEl.addEventListener("click", loadColors);
+window.addEventListener("load", loadColors);
 </script>
 
 </body>
