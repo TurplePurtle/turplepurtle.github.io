@@ -1,0 +1,4 @@
+turret targeting
+vocoder
+monte carlo pi estimation
+ultrasonic modem
