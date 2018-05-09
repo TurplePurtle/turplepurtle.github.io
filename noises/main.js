@@ -48,4 +48,6 @@ function makeRandomNoise() {
 
 document
   .querySelector("#make-random-noise")
-  .addEventListener("click", makeRandomNoise);
+  .addEventListener("click", () => {
+    ctx.resume().then(makeRandomNoise);
+  });
