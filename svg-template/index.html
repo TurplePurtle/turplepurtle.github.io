@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>SVG Template</title>
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+}
+.container {
+  height: 100%;
+}
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex {
+  flex: 1;
+  border: 1px solid;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+</head>
+<body>
+
+<div class="container flex-row">
+  <div class="flex flex-col">
+    <textarea id="js" class="flex"></textarea>
+    <textarea id="svg" class="flex"></textarea>
+  </div>
+  <div class="flex flex-col">
+    <div id="output" class="flex"></div>
+  </div>
+</div>
+
+<script>
+const out = {};
+
+const jsEl = document.querySelector("#js");
+const svgEl = document.querySelector("#svg");
+const outputEl = document.querySelector("#output");
+
+const EXAMPLE_JS =
+`out.x = 50
+out.y = 20
+out.w = out.x * 2
+out.h = out.y * 2
+`;
+const EXAMPLE_SVG = 
+`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <rect x="{{x}}" y="{{y}}" width="{{w}}" height="{{h}}" />
+
+</svg>
+`;
+jsEl.value = EXAMPLE_JS;
+svgEl.value = EXAMPLE_SVG;
+
+function run() {
+  const template = Handlebars.compile(svgEl.value);
+  eval(jsEl.value);
+  console.log(out);
+  const result = template(out);
+  console.log(result);
+  outputEl.innerHTML = result;
+}
+
+jsEl.addEventListener("keyup", run);
+svgEl.addEventListener("keyup", run);
+run();
+</script>
+
+</body>
+</html>
