@@ -54,10 +54,10 @@ out.w = out.x * 2
 out.h = out.y * 2
 `;
 const EXAMPLE_SVG = 
-`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-
+`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%">
+ <g fill="none" stroke="black">
   <rect x="{{x}}" y="{{y}}" width="{{w}}" height="{{h}}" />
-
+ </g>
 </svg>
 `;
 jsEl.value = EXAMPLE_JS;
@@ -66,9 +66,7 @@ svgEl.value = EXAMPLE_SVG;
 function run() {
   const template = Handlebars.compile(svgEl.value);
   eval(jsEl.value);
-  console.log(out);
   const result = template(out);
-  console.log(result);
   outputEl.innerHTML = result;
 }
 
