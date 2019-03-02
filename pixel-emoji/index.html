@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Pixel Emoji!</title>
+<script src="pixel-emoji.js" defer></script>
+<style>
+.input-form {
+  margin-bottom: 16px;
+}
+
+#canvas {
+  display: inline-block;
+  border-style: solid;
+  border-color: #888;
+  border-width: 1px 0 0 1px;
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  width: 16px;
+  height: 16px;
+  border-style: solid;
+  border-color: #888;
+  border-width: 0 1px 1px 0;
+}
+
+.black {
+  background-color: #111;
+}
+
+#output {
+  line-height: 1;
+  white-space: pre;
+}
+</style>
+</head>
+<body>
+
+<div class="input-form">
+  <form>
+    <label>
+      Width
+      <input id="input-width" type="text">
+    </label>
+  
+    <label>
+      Height
+      <input id="input-height" type="text">
+    </label>  
+  </form>
+</div>
+
+<div id="canvas"></div>
+
+<h4>Output</h4>
+<div id="output"></div>
+
+</body>
+</html>
