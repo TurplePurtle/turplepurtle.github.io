@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Whistle, baby!</title>
+  <script src="main.js" type="module" defer></script>
+  <style>
+#canvas {
+  display: block;
+}
+  </style>
+</head>
+<body>
+
+<p>
+  Click "record", then whistle a bit and click "stop".
+  Then you can play back what you whistled and look at the note data.
+</p>
+
+<button id="record-button">Record</button>
+<button id="stop-button" disabled>Stop</button>
+<button id="playback-button" disabled>Play back</button>
+<a href="">Reload page</a>
+<canvas id="canvas"></canvas>
+
+</body>
+</html>
