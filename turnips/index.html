@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>turnip page</title>
+<base target="_blank"> 
+<style>
+html, body {
+  background-color: #333;
+  margin: 0;
+}
+a {
+  color: #ecd86a;
+}
+article {
+  color: #fff;
+  border: 1px solid;
+  border-radius: 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 8px;
+  padding: 0 8px;
+}
+p {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+</style>
+<script type="module">
+
+const url = 'https://old.reddit.com/r/acturnips/new.json?limit=5';
+/** @type {HTMLAudioElement} */
+const audio = document.getElementById('snap');
+const interval = 2000;
+const container = document.getElementById('results');
+let lastTopId = '';
+
+setInterval(update, interval);
+
+async function update() {
+  console.log(`updating at ${new Date().toLocaleTimeString()}`);
+  const r = await fetch(url);
+  const json = await r.json();
+  window.last = json;
+  const posts = json.data.children;
+  const newHtml = posts.map(renderPost).join('');
+  container.innerHTML = newHtml;
+
+  const topId = posts[0].data.id;
+  if (lastTopId !== topId) {
+    lastTopId = topId;
+    audio.currentTime = 0;
+    audio.play();
+    const notification =
+      new Notification('New post!', {
+        body: posts[0].data.title,
+        silent: true,
+        requireInteraction: false,
+      });
+    console.log(notification);
+    setTimeout(() => { notification.close(); }, 10000);
+  }
+}
+
+function renderPost(post) {
+  const data = post.data;
+  const secondsAgo = Date.now() / 1000 - data.created_utc;
+  const timestamp = new Date(data.created_utc * 1000).toLocaleTimeString();
+  return `<article>
+    <h3><a href="${postLink(post)}">${data.title}</a></h3>
+    <small>${secondsAgo | 0}s ago · ${data.num_comments} comments</small>
+    <p>${unescapeHtml(data.selftext_html)}<p>
+  </article>`;
+}
+
+function unescapeHtml(input) {
+  const e = document.createElement('textarea');
+  e.innerHTML = input;
+  return e.childNodes[0]?.nodeValue ?? '';
+}
+
+function postLink(post) {
+  return `https://www.reddit.com/r/acturnips/comments/${post.data.id}/`;
+}
+
+const notifEl = document.getElementById('notifications');
+if (Notification.permission === 'granted') {
+  notifEl.remove();
+} else {
+  notifEl.onclick = async () => {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      notifEl.remove();
+    }
+  };
+}
+
+</script>
+</head>
+<body>
+<audio id="snap" preload="auto" src="snap.ogg"></audio>
+<small id="notifications">[click to receive notifications]</small>
+<div id="results"></div>
+</body>
+</html>
