@@ -58,8 +58,12 @@ async function update() {
         silent: true,
         requireInteraction: false,
       });
-    console.log(notification);
-    setTimeout(() => { notification.close(); }, 10000);
+    const timeout = setTimeout(() => { notification.close(); }, 10000);
+    notification.onclick = () => {
+      parent.focus();
+      notification.close();
+      window.clearTimeout(timeout);
+    };
   }
 }
 
