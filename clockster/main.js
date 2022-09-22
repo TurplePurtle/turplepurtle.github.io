@@ -158,23 +158,38 @@ function durationUntilNextSecond() {
     afterUpdate.getDate(),
     afterUpdate.getHours(),
     afterUpdate.getMinutes(),
-    afterUpdate.getSeconds() + 1,
+    afterUpdate.getSeconds() + 1
   );
   return nextSecond.getTime() - afterUpdate.getTime();
 }
 
-/** @return {number[]} */
-function getTimePattern() {
-  const now = new Date();
-  const time = `${now.getHours()}`.padStart(2, "0") +
+/**
+ * @param {Date} now
+ * @return {number[]}
+ */
+function getTimePattern(now) {
+  const time =
+    `${now.getHours()}`.padStart(2, "0") +
     `${now.getMinutes()}`.padStart(2, "0") +
     `${now.getSeconds()}`.padStart(2, "0");
   return time.split("").flatMap((i) => ps[i]);
 }
 
+/** @param {Date} now */
+function setTitle(now) {
+  document.title =
+    `${now.getHours()}`.padStart(2, "0") +
+    ":" +
+    `${now.getMinutes()}`.padStart(2, "0") +
+    ":" +
+    `${now.getSeconds()}`.padStart(2, "0");
+}
+
 /** @param {Clock[]} clocks */
 function tick(clocks) {
-  setPattern(clocks, getTimePattern());
+  const now = new Date();
+  setPattern(clocks, getTimePattern(now));
+  setTitle(now);
   setTimeout(tick, durationUntilNextSecond(), clocks);
 }
 
