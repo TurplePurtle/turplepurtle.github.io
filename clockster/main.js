@@ -20,8 +20,12 @@ class Clock {
   }
 }
 
-/** @return {Array<Clock>} */
-function initClocks() {
+/**
+ * @param {number} width
+ * @param {number} height
+ * @return {Array<Clock>}
+ */
+function initClocks(width, height) {
   /** @type {HTMLTemplateElement} */
   const template = document.querySelector("#clock-template");
   /** @type {HTMLDivElement} */
@@ -29,10 +33,10 @@ function initClocks() {
   /** @type {Clock[]} */
   const clocks = [];
 
-  for (let y = 0; y < 3; y++) {
+  for (let y = 0; y < height; y++) {
     const row = document.createElement("div");
     row.className = "row";
-    for (let x = 0; x < 8; x++) {
+    for (let x = 0; x < width; x++) {
       const instance = template.content.cloneNode(true);
       const svgEl = instance.querySelector("svg");
       svgEl.setAttribute("id", `c-${x}-${y}`);
@@ -50,9 +54,10 @@ function initClocks() {
 
 /**
  * @param {number} index
+ * @param {number} width
  * @return {number}
  */
-function mapIndex(index) {
+function mapIndex(index, width) {
   const ii = (index / 2) | 0;
   const digit = (ii / 6) | 0;
   const digitX = ii % 2;
@@ -60,7 +65,7 @@ function mapIndex(index) {
   const x = digit * 2 + digitX;
   const y = digitY;
   const j = index % 2;
-  return y * 8 + x + j;
+  return y * width + x + j;
 }
 
 /**
@@ -70,7 +75,7 @@ function mapIndex(index) {
 function setPattern(clocks, pattern) {
   requestAnimationFrame(() => {
     for (let i = 0; i < pattern.length; i += 2) {
-      clocks[mapIndex(i)].setAngle(pattern[i], pattern[i + 1]);
+      clocks[mapIndex(i, 12)].setAngle(pattern[i], pattern[i + 1]);
     }
   });
 }
@@ -144,18 +149,33 @@ function durationUntilNextMinute() {
   return nextMinute.getTime() - afterUpdate.getTime();
 }
 
+/** @return {number} */
+function durationUntilNextSecond() {
+  const afterUpdate = new Date();
+  const nextSecond = new Date(
+    afterUpdate.getFullYear(),
+    afterUpdate.getMonth(),
+    afterUpdate.getDate(),
+    afterUpdate.getHours(),
+    afterUpdate.getMinutes(),
+    afterUpdate.getSeconds() + 1,
+  );
+  return nextSecond.getTime() - afterUpdate.getTime();
+}
+
 /** @return {number[]} */
 function getTimePattern() {
   const now = new Date();
   const time = `${now.getHours()}`.padStart(2, "0") +
-    `${now.getMinutes()}`.padStart(2, "0");
+    `${now.getMinutes()}`.padStart(2, "0") +
+    `${now.getSeconds()}`.padStart(2, "0");
   return time.split("").flatMap((i) => ps[i]);
 }
 
 /** @param {Clock[]} clocks */
 function tick(clocks) {
   setPattern(clocks, getTimePattern());
-  setTimeout(tick, durationUntilNextMinute(), clocks);
+  setTimeout(tick, durationUntilNextSecond(), clocks);
 }
 
-tick(initClocks());
+tick(initClocks(12, 3));
