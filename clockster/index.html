@@ -18,8 +18,13 @@ svg {
   flex: 0 0 auto;
 }
 line {
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-width: 11px;
   transform-origin: center;
-  transition: transform 0.95s cubic-bezier(0.2, 0.7, 0.85, 1.35);
+  transition:
+    transform 0.95s cubic-bezier(0.2, 0.7, 0.85, 1.35),
+    stroke 0.5s;
 }
 </style>
 <script src="main.js" defer></script>
@@ -30,14 +35,8 @@ line {
 
 <template id="clock-template">
   <svg height="100" width="100">
-    <line
-      x1="50" y1="50" x2="100" y2="50"
-      stroke="#fff" stroke-width="11" stroke-linecap="round"
-    />
-    <line
-      x1="50" y1="50" x2="100" y2="50"
-      stroke="#fff" stroke-width="11" stroke-linecap="round"
-    />
+    <line x1="50" y1="50" x2="100" y2="50" />
+    <line x1="50" y1="50" x2="100" y2="50" />
   </svg>
 </template>
 
