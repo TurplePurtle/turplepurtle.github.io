@@ -5,6 +5,7 @@ class Clock {
    */
   static setLineAngle(line, angle) {
     line.style.transform = `rotate(${-360 * angle}deg)`;
+    line.style.stroke = angle === 5/8 ? '#777' : '';
   }
 
   constructor(line1, line2) {
@@ -149,18 +150,20 @@ function durationUntilNextMinute() {
   return nextMinute.getTime() - afterUpdate.getTime();
 }
 
-/** @return {number} */
-function durationUntilNextSecond() {
-  const afterUpdate = new Date();
+/**
+ * @param {Date} now
+ * @return {number}
+ */
+function durationUntilNextSecond(now) {
   const nextSecond = new Date(
-    afterUpdate.getFullYear(),
-    afterUpdate.getMonth(),
-    afterUpdate.getDate(),
-    afterUpdate.getHours(),
-    afterUpdate.getMinutes(),
-    afterUpdate.getSeconds() + 1
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds() + 1
   );
-  return nextSecond.getTime() - afterUpdate.getTime();
+  return nextSecond.getTime() - now.getTime();
 }
 
 /**
@@ -190,7 +193,7 @@ function tick(clocks) {
   const now = new Date();
   setPattern(clocks, getTimePattern(now));
   setTitle(now);
-  setTimeout(tick, durationUntilNextSecond(), clocks);
+  setTimeout(tick, durationUntilNextSecond(now), clocks);
 }
 
 tick(initClocks(12, 3));
