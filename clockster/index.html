@@ -6,11 +6,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clockster</title>
 <style>
+html, body {
+  height: 100%;
+}
 body {
   background-color: #111;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
 }
 .row {
   display: flex;
+  justify-content: center;
 }
 svg {
   border: 1px solid rgba(255,255,255,0.1);
@@ -23,18 +31,26 @@ line {
   stroke-width: 11px;
   transform-origin: center;
   transition:
+    transform 5s,
+    stroke 3s;
+}
+.seconds line {
+  transition:
     transform 0.95s cubic-bezier(0.2, 0.7, 0.85, 1.35),
     stroke 0.5s;
+}
+.faded {
+  stroke: #555;
 }
 </style>
 <script src="main.js" defer></script>
 </head>
-<body>
+<body class="seconds">
 
 <div id="clock-container"></div>
 
 <template id="clock-template">
-  <svg height="100" width="100">
+  <svg class="clock" height="100" width="100">
     <line x1="50" y1="50" x2="100" y2="50" />
     <line x1="50" y1="50" x2="100" y2="50" />
   </svg>

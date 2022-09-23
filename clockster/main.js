@@ -1,3 +1,5 @@
+const OFF = 9/16;
+
 class Clock {
   /**
    * @param {SVGLineElement} line
@@ -5,10 +7,12 @@ class Clock {
    */
   static setLineAngle(line, angle) {
     line.style.transform = `rotate(${-360 * angle}deg)`;
-    line.style.stroke = angle === 5/8 ? '#777' : '';
+    line.setAttribute('class', angle === OFF ? 'faded' : '');
   }
 
-  constructor(line1, line2) {
+  constructor(svg, line1, line2) {
+    /** @type {SVGElement} */
+    this.svg = svg;
     /** @type {SVGLineElement} */
     this.line1 = line1;
     /** @type {SVGLineElement} */
@@ -18,6 +22,11 @@ class Clock {
   setAngle(a1, a2) {
     Clock.setLineAngle(this.line1, a1);
     Clock.setLineAngle(this.line2, a2);
+  }
+
+  /** @param {boolean} value */
+  toggle(value) {
+    this.svg.style.display = value ? '' : 'none';
   }
 }
 
@@ -44,12 +53,13 @@ function initClocks(width, height) {
       const lineEls = instance.querySelectorAll("line");
       lineEls[0].setAttribute("class", "l-0");
       lineEls[1].setAttribute("class", "l-1");
-      clocks.push(new Clock(lineEls[0], lineEls[1]));
+      clocks.push(new Clock(svgEl, lineEls[0], lineEls[1]));
       row.appendChild(instance);
     }
     container.appendChild(row);
   }
 
+  console.log(`initialized ${clocks.length} clocks`);
   return clocks;
 }
 
@@ -89,9 +99,9 @@ const ps = (function () {
     0/1, 1/4, 1/4, 1/2,
   ];
   const p1 =[
-    5/8, 5/8, 5/8, 3/4,
-    5/8, 5/8, 1/4, 3/4,
-    5/8, 5/8, 1/4, 1/4,
+    OFF, OFF, 5/8, 3/4,
+    OFF, OFF, 1/4, 3/4,
+    OFF, OFF, 1/4, 1/4,
   ];
   const p2 = [
     0/1, 0/1, 1/2, 3/4,
@@ -106,7 +116,7 @@ const ps = (function () {
   const p4 = [
     3/4, 3/4, 3/4, 3/4,
     0/1, 1/4, 1/4, 3/4,
-    5/8, 5/8, 1/4, 1/4,
+    OFF, OFF, 1/4, 1/4,
   ];
   const p5 = [
     0/1, 3/4, 1/2, 1/2,
@@ -120,8 +130,8 @@ const ps = (function () {
   ];
   const p7 = [
     0/1, 0/1, 1/2, 3/4,
-    5/8, 5/8, 1/4, 3/4,
-    5/8, 5/8, 1/4, 1/4,
+    OFF, OFF, 1/4, 3/4,
+    OFF, OFF, 1/4, 1/4,
   ];
   const p8 = [
     0/1, 3/4, 1/2, 3/4,
@@ -196,4 +206,18 @@ function tick(clocks) {
   setTimeout(tick, durationUntilNextSecond(now), clocks);
 }
 
-tick(initClocks(12, 3));
+const clocks = initClocks(12, 3);
+let seconds = true;
+tick(clocks);
+
+function onClick() {
+  seconds = !seconds;
+  document.body.classList.toggle('seconds', seconds);
+  for (let i = 8; i < 12; i++) {
+    clocks[i].toggle(seconds);
+    clocks[i+12].toggle(seconds);
+    clocks[i+24].toggle(seconds);
+  }
+}
+
+document.querySelector('#clock-container').addEventListener('click', onClick);
