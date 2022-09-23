@@ -23,7 +23,7 @@ body {
 svg {
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 999px;
-  flex: 0 0 auto;
+  flex: 1 0 100px;
 }
 line {
   stroke: #fff;
@@ -50,7 +50,7 @@ line {
 <div id="clock-container"></div>
 
 <template id="clock-template">
-  <svg class="clock" height="100" width="100">
+  <svg class="clock" viewBox="0 0 100 100">
     <line x1="50" y1="50" x2="100" y2="50" />
     <line x1="50" y1="50" x2="100" y2="50" />
   </svg>
