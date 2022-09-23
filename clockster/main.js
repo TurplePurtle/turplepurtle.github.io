@@ -1,4 +1,4 @@
-const OFF = 9/16;
+const OFF = 9 / 16;
 
 class Clock {
   /**
@@ -7,7 +7,7 @@ class Clock {
    */
   static setLineAngle(line, angle) {
     line.style.transform = `rotate(${-360 * angle}deg)`;
-    line.setAttribute('class', angle === OFF ? 'faded' : '');
+    line.setAttribute("class", angle === OFF ? "faded" : "");
   }
 
   constructor(svg, line1, line2) {
@@ -26,7 +26,7 @@ class Clock {
 
   /** @param {boolean} value */
   toggle(value) {
-    this.svg.style.display = value ? '' : 'none';
+    this.svg.style.display = value ? "" : "none";
   }
 }
 
@@ -210,14 +210,18 @@ const clocks = initClocks(12, 3);
 let seconds = true;
 tick(clocks);
 
-function onClick() {
+function toggleSeconds() {
   seconds = !seconds;
-  document.body.classList.toggle('seconds', seconds);
+  document.body.classList.toggle("seconds", seconds);
   for (let i = 8; i < 12; i++) {
     clocks[i].toggle(seconds);
-    clocks[i+12].toggle(seconds);
-    clocks[i+24].toggle(seconds);
+    clocks[i + 12].toggle(seconds);
+    clocks[i + 24].toggle(seconds);
   }
 }
 
-document.querySelector('#clock-container').addEventListener('click', onClick);
+document
+  .querySelector("#clock-container")
+  .addEventListener("click", toggleSeconds);
+
+toggleSeconds();
