@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elden Ring Message Generator</title>
+<style>
+.hidden {display: none}
+section {
+  margin-bottom: 8px;
+}
+</style>
+<script src="messages.js" defer></script>
+<script src="main.js" defer></script>
+</head>
+
+<body>
+
+<h2 id="message-container"></h2>
+
+<section>
+  <button id="randomize-button">Randomize</button>
+</section>
+
+<section>
+  <label>
+    Template
+    <select id="select-template"></select>
+  </label>
+
+  <label>
+    Word
+    <select id="select-word">
+      <option selected value="____">&lt;none&gt;</option>
+    </select>
+  </label>
+</section>
+
+<section>
+  <label>
+    Conjunction
+    <select id="select-conjunction">
+      <option selected value>&lt;none&gt;</option>
+    </select>
+  </label>
+</section>
+
+<section>
+  <label id="select-template2-label" class="hidden">
+    Template
+    <select id="select-template2"></select>
+  </label>
+
+  <label id="select-word2-label" class="hidden">
+    Word
+    <select id="select-word2">
+      <option selected value="____">&lt;none&gt;</option>
+    </select>
+  </label>
+</section>
+
+</body>
+</html>
