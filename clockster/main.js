@@ -7,16 +7,21 @@ class Clock {
    */
   static setLineAngle(line, angle) {
     line.style.transform = `rotate(${-360 * angle}deg)`;
-    line.setAttribute("class", angle === OFF ? "faded" : "");
+    line.classList.toggle("faded", angle === OFF);
   }
 
-  constructor(svg, line1, line2) {
+  /** @param {SVGElement} svg */
+  constructor(svg) {
+    const handEls = svg.querySelectorAll(".hand");
+    if (handEls.length !== 2) {
+      throw Error("A clock should have 2 hands.");
+    }
     /** @type {SVGElement} */
     this.svg = svg;
     /** @type {SVGLineElement} */
-    this.line1 = line1;
+    this.line1 = handEls[0];
     /** @type {SVGLineElement} */
-    this.line2 = line2;
+    this.line2 = handEls[1];
   }
 
   setAngle(a1, a2) {
@@ -50,10 +55,7 @@ function initClocks(width, height) {
       const instance = template.content.cloneNode(true);
       const svgEl = instance.querySelector("svg");
       svgEl.setAttribute("id", `c-${x}-${y}`);
-      const lineEls = instance.querySelectorAll("line");
-      lineEls[0].setAttribute("class", "l-0");
-      lineEls[1].setAttribute("class", "l-1");
-      clocks.push(new Clock(svgEl, lineEls[0], lineEls[1]));
+      clocks.push(new Clock(svgEl));
       row.appendChild(instance);
     }
     container.appendChild(row);
