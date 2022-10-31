@@ -93,7 +93,7 @@ function setPattern(clocks, pattern) {
   });
 }
 
-/** @type {number[]} */
+/** @type {number[][]} */
 const ps = (function () {
   const p0 = [
     0/1, 3/4, 1/2, 3/4,
@@ -212,7 +212,9 @@ const clocks = initClocks(12, 3);
 let seconds = true;
 tick(clocks);
 
-function toggleSeconds() {
+/** @param {boolean} enabled */
+function toggleSeconds(enabled) {
+  if (enabled === seconds) return;
   seconds = !seconds;
   document.body.classList.toggle("seconds", seconds);
   for (let i = 8; i < 12; i++) {
@@ -224,6 +226,55 @@ function toggleSeconds() {
 
 document
   .querySelector("#clock-container")
-  .addEventListener("click", toggleSeconds);
+  .addEventListener("click", (e) => toggleSetting('seconds'));
 
-toggleSeconds();
+// toggleSeconds(!seconds);
+
+/** @type {Record<string, (enabled: boolean) => void>} */
+const settings = {
+  light(enabled) {
+    document.body.classList.toggle("light", enabled);
+  },
+  seconds(enabled) {
+    toggleSeconds(enabled);
+  },
+};
+
+function checkSettings() {
+  const list = !location.hash.length ? [] : location.hash.slice(1).split(",");
+  for (const name in settings) {
+    settings[name](list.indexOf(name) >= 0);
+  }
+}
+
+/**
+ * @param {string} name
+ * @param {boolean|undefined} value
+ */
+function toggleSetting(name, value) {
+  const list = !location.hash.length ? [] : location.hash.slice(1).split(",");
+  const index = list.indexOf(name);
+  const found = index >= 0;
+  const changed = found ? value !== true : value !== false;
+  if (!changed) return;
+
+  // Update URL
+  if (found) {
+    list.splice(index, 1);
+  } else {
+    list.push(name);
+  }
+  location.hash = list.join(",");
+
+  // Callback
+  settings[name](!found);
+}
+
+document.body.addEventListener("click", (e) => {
+  if (e.target !== document.body) return;
+  toggleSetting("light");
+  e.stopPropagation();
+}, true);
+
+window.addEventListener("hashchange", checkSettings);
+checkSettings();
