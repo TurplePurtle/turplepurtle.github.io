@@ -28,7 +28,8 @@ svg {
   margin: .25%;
   padding: .5%;
 }
-.hand {
+.hand,
+.hand-shadow {
   stroke: #fff;
   stroke-linecap: round;
   stroke-width: 11px;
@@ -37,13 +38,43 @@ svg {
     transform 5s,
     stroke 3s;
 }
-.seconds .hand {
+.is-seconds {
+  display: none;
+}
+.seconds .is-seconds {
+  display: block;
+}
+.seconds .hand,
+.seconds .hand-shadow {
   transition:
     transform 0.95s cubic-bezier(0.2, 0.7, 0.85, 1.35),
     stroke 0.5s;
 }
 .hand.faded {
   stroke: #555;
+}
+.hand-shadow {
+  filter: blur(1px);
+  stroke: rgba(0, 0, 0, 0.5);
+  transform-origin: 54% 52%;
+}
+
+#settings {
+  background-color: #111;
+  border: 1px solid;
+  color: #fff;
+  left: 0;
+  opacity: 1;
+  position: absolute;
+  top: 0;
+  transition: opacity .5s;
+  will-change: opacity;
+}
+#settings.hidden {
+  opacity: 0;
+}
+.setting {
+  padding: 4px;
 }
 
 body.light {
@@ -59,6 +90,21 @@ body.light {
 .light .hand.faded {
   stroke: #777;
 }
+.light .hand-shadow {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+.light #settings {
+  background-color: #ccc;
+  color: #222;
+}
+
+.no-shadows svg {
+  border: 1px solid #777;
+  box-shadow: none;
+}
+.no-shadows .hand-shadow {
+  display: none;
+}
 </style>
 <script src="main.js" defer></script>
 </head>
@@ -66,9 +112,13 @@ body.light {
 
 <div id="clock-container"></div>
 
+<div id="settings" class="hidden"></div>
+
 <template id="clock-template">
   <svg class="clock" viewBox="0 0 100 100">
+    <line class="hand-shadow" x1="54" y1="52" x2="100" y2="52" />
     <line class="hand" x1="50" y1="50" x2="100" y2="50" />
+    <line class="hand-shadow" x1="54" y1="52" x2="100" y2="52" />
     <line class="hand" x1="50" y1="50" x2="100" y2="50" />
   </svg>
 </template>

@@ -1,32 +1,57 @@
+// @ts-check
+
 const OFF = 9 / 16;
+
+/**
+ * @template T
+ * @param {any} value
+ * @param {{new(): T}} type
+ * @returns {T}
+ */
+function assertType(value, type) {
+  if (value instanceof type) return value;
+  throw TypeError();
+}
 
 class Clock {
   /**
    * @param {SVGLineElement} line
    * @param {number} angle
+   * @param {boolean=} maybeFade
    */
-  static setLineAngle(line, angle) {
+  static setLineAngle(line, angle, maybeFade = true) {
     line.style.transform = `rotate(${-360 * angle}deg)`;
-    line.classList.toggle("faded", angle === OFF);
+    if (maybeFade) line.classList.toggle("faded", angle === OFF);
   }
 
   /** @param {SVGElement} svg */
   constructor(svg) {
     const handEls = svg.querySelectorAll(".hand");
+    const shadows = svg.querySelectorAll(".hand-shadow");
     if (handEls.length !== 2) {
       throw Error("A clock should have 2 hands.");
     }
     /** @type {SVGElement} */
     this.svg = svg;
     /** @type {SVGLineElement} */
-    this.line1 = handEls[0];
+    this.line1 = assertType(handEls[0], SVGLineElement);
     /** @type {SVGLineElement} */
-    this.line2 = handEls[1];
+    this.line2 = assertType(handEls[1], SVGLineElement);
+    /** @type {SVGLineElement} */
+    this.shadow1 = assertType(shadows[0], SVGLineElement);
+    /** @type {SVGLineElement} */
+    this.shadow2 = assertType(shadows[1], SVGLineElement);
   }
 
+  /**
+   * @param {number} a1
+   * @param {number} a2
+   */
   setAngle(a1, a2) {
     Clock.setLineAngle(this.line1, a1);
     Clock.setLineAngle(this.line2, a2);
+    Clock.setLineAngle(this.shadow1, a1, false);
+    Clock.setLineAngle(this.shadow2, a2, false);
   }
 
   /** @param {boolean} value */
@@ -41,10 +66,14 @@ class Clock {
  * @return {Array<Clock>}
  */
 function initClocks(width, height) {
-  /** @type {HTMLTemplateElement} */
-  const template = document.querySelector("#clock-template");
-  /** @type {HTMLDivElement} */
-  const container = document.querySelector("#clock-container");
+  const template = assertType(
+    document.querySelector("#clock-template"),
+    HTMLTemplateElement
+  );
+  const container = assertType(
+    document.querySelector("#clock-container"),
+    HTMLElement
+  );
   /** @type {Clock[]} */
   const clocks = [];
 
@@ -52,13 +81,22 @@ function initClocks(width, height) {
     const row = document.createElement("div");
     row.className = "row";
     for (let x = 0; x < width; x++) {
-      const instance = template.content.cloneNode(true);
-      const svgEl = instance.querySelector("svg");
+      const instance = assertType(
+        template.content.cloneNode(true),
+        DocumentFragment
+      );
+      const svgEl = assertType(instance.querySelector("svg"), SVGSVGElement);
       svgEl.setAttribute("id", `c-${x}-${y}`);
       clocks.push(new Clock(svgEl));
       row.appendChild(instance);
     }
     container.appendChild(row);
+  }
+
+  for (let i = 8; i < 12; i++) {
+    clocks[i].svg.classList.add("is-seconds");
+    clocks[i + 12].svg.classList.add("is-seconds");
+    clocks[i + 24].svg.classList.add("is-seconds");
   }
 
   console.log(`initialized ${clocks.length} clocks`);
@@ -93,6 +131,7 @@ function setPattern(clocks, pattern) {
   });
 }
 
+// prettier-ignore
 /** @type {number[][]} */
 const ps = (function () {
   const p0 = [
@@ -209,72 +248,72 @@ function tick(clocks) {
 }
 
 const clocks = initClocks(12, 3);
-let seconds = true;
 tick(clocks);
 
-/** @param {boolean} enabled */
-function toggleSeconds(enabled) {
-  if (enabled === seconds) return;
-  seconds = !seconds;
-  document.body.classList.toggle("seconds", seconds);
-  for (let i = 8; i < 12; i++) {
-    clocks[i].toggle(seconds);
-    clocks[i + 12].toggle(seconds);
-    clocks[i + 24].toggle(seconds);
-  }
-}
-
-document
-  .querySelector("#clock-container")
-  .addEventListener("click", (e) => toggleSetting('seconds'));
-
-// toggleSeconds(!seconds);
-
-/** @type {Record<string, (enabled: boolean) => void>} */
-const settings = {
-  light(enabled) {
-    document.body.classList.toggle("light", enabled);
-  },
-  seconds(enabled) {
-    toggleSeconds(enabled);
-  },
-};
+const settings = ["light", "seconds", "no-shadows"];
+const activeSettings = !location.hash.length
+  ? []
+  : location.hash.slice(1).split(",");
 
 function checkSettings() {
-  const list = !location.hash.length ? [] : location.hash.slice(1).split(",");
-  for (const name in settings) {
-    settings[name](list.indexOf(name) >= 0);
-  }
+  document.body.className = activeSettings.join(" ");
 }
 
 /**
  * @param {string} name
- * @param {boolean|undefined} value
+ * @param {boolean=} value
  */
 function toggleSetting(name, value) {
-  const list = !location.hash.length ? [] : location.hash.slice(1).split(",");
-  const index = list.indexOf(name);
+  const index = activeSettings.indexOf(name);
   const found = index >= 0;
   const changed = found ? value !== true : value !== false;
   if (!changed) return;
 
   // Update URL
   if (found) {
-    list.splice(index, 1);
+    activeSettings.splice(index, 1);
   } else {
-    list.push(name);
+    activeSettings.push(name);
   }
-  location.hash = list.join(",");
+  location.hash = activeSettings.join(",");
 
-  // Callback
-  settings[name](!found);
+  // Update body class
+  document.body.className = activeSettings.join(" ");
 }
-
-document.body.addEventListener("click", (e) => {
-  if (e.target !== document.body) return;
-  toggleSetting("light");
-  e.stopPropagation();
-}, true);
 
 window.addEventListener("hashchange", checkSettings);
 checkSettings();
+
+(function initSettingsContainer() {
+  /** @type {HTMLElement} */
+  const settingsContainer = assertType(
+    document.querySelector("#settings"),
+    HTMLElement
+  );
+
+  for (const name of settings) {
+    const label = document.createElement("label");
+    label.className = "setting";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = activeSettings.indexOf(name) >= 0;
+    checkbox.addEventListener("change", () =>
+      toggleSetting(name, checkbox.checked)
+    );
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(name));
+    settingsContainer.appendChild(label);
+  }
+
+  let settingsTimeout = 0;
+  function hideSettings() {
+    settingsContainer.classList.add("hidden");
+  }
+  function showSettingsOnMouseMove() {
+    clearTimeout(settingsTimeout);
+    settingsContainer.classList.remove("hidden");
+    settingsTimeout = setTimeout(hideSettings, 3000);
+  }
+  document.body.addEventListener("click", showSettingsOnMouseMove);
+  document.body.addEventListener("mousemove", showSettingsOnMouseMove);
+})();
