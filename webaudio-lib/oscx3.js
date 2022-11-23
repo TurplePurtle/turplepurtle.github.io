@@ -33,7 +33,7 @@ var O = function(context) {
 
 O.prototype.start = function(t) {
 	for (var i=0; i<3; i++) {
-		this.osc[i].noteOn(t);
+		this.osc[i].start(t);
 	}
 };
 
