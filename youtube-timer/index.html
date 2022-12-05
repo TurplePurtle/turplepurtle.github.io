@@ -4,8 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <title>YouTube Timer</title>
 <link rel="stylesheet" href="resources/yttimer.css">
-<script src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-<script src="resources/yttimer.js"></script>
+<script src="resources/yttimer.js" defer></script>
+<script src="https://www.youtube.com/iframe_api" defer></script>
 </head>
 
 <body>
@@ -13,7 +13,6 @@
 
 <p class="center">
   <button id="yt-load">Load Video</button>
-  <button id="yt-search">Search for Videos</button>
   <button id="set-time">Set Timer</button>
   <button id="start">Start</button>
 </p>
